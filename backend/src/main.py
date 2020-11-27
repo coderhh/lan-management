@@ -1,29 +1,25 @@
-# coding=utf-8
+from flask import Flask,jsonify
+from .services.h3c import get_mac_ip_binding
+app = Flask(__name__)
 
-from .entities.entity import Session, engine, Base
-
-from .entities.exam import Exam
-
-# generate database schema
-Base.metadata.create_all(engine)
-
-# start session
-session = Session()
-
-# check for existing data
-exams = session.query(Exam).all()
-
-if len(exams) == 0:
-    # create and persist mock exam
-    python_exam = Exam("SQLAlchemy Exam", "Test your knowledge about SQLAlchemy.", "script")
-    session.add(python_exam)
-    session.commit()
-    session.close()
-
-    # reload exams
-    exams = session.query(Exam).all()
-
-# show existing exams
-print('### Exams:')
-for exam in exams:
-    print(f'({exam.id}) {exam.title} - {exam.description}')
+@app.route('/lan/api/v1.0/vlan/<string:vlan_id>', methods=['GET'])
+def get_mac_ip_bind(vlan_id):
+    vlanbindings = get_mac_ip_binding(vlan_id)
+    static_bind = []
+    
+    for bind in vlanbindings.static_bind:
+        static_bind.append({"ip_address": bind.ip_address, 
+                            "mask": bind.mask, 
+                            "mac_address": bind.mac_address
+                        })
+        
+    
+    vlan = {
+        "vlan_name": vlanbindings.vlan_name,
+        "network": vlanbindings.network,
+        "dns_list": vlanbindings.dns_list,
+        "gateway_list": vlanbindings.gateway_list,
+        "mask": vlanbindings.mask,
+        "static_bind": static_bind
+    }
+    return jsonify(vlan)
