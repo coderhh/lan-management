@@ -1,0 +1,26 @@
+<div class="example-container">
+    <div class="form-container">
+      <h1>ADD NEW RULE</h1>
+      <form [formGroup]="newRuleForm" (submit)="submit()">
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label> Rule Num
+          </mat-label>
+          <input matInput formControlName="rule_num" required>
+          <mat-error *ngIf="newRuleForm.controls.rule_num.touched && newRuleForm.controls.rule_num.invalid">
+            <span *ngIf="newRuleForm.controls.rule_num.errors?.required">This field is mandatory.</span>
+            <span *ngIf="newRuleForm.controls.rule_num.errors?.pattern">This field is invalid.</span>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label> Ip Address
+          </mat-label>
+          <input matInput formControlName="ip_address" required>
+          <mat-error *ngIf="newRuleForm.controls.ip_address.touched && newRuleForm.controls.ip_address.invalid">
+            <span *ngIf="newRuleForm.controls.ip_address.errors?.required">This field is mandatory.</span>
+            <span *ngIf="newRuleForm.controls.ip_address.errors?.pattern">This field is invalid.</span>
+          </mat-error>
+        </mat-form-field>
+        <button mat-raised-button color="primary" type="submit">Add</button>
+      </form>
+    </div>
+  </div>
