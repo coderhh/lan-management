@@ -13,17 +13,13 @@ FIREWALL_PASSWORD = "admin"
 
 def bind_mac_ip(mac, vlan, ip):
     """Bind mac with static ip address to access internal server on layer-3 switch"""
-    HOST = "172.16.10.253"
-    USER = "admin"
-    PASSWORD = "admin"
-
-    tn = telnetlib.Telnet(HOST)
-
+    tn = telnetlib.Telnet(L3SWICH_HOST)
+    vlan = 'vlan'+vlan
     tn.read_until(b"login: ")
-    tn.write(USER.encode('ascii') + b"\n")
-    if PASSWORD:
+    tn.write(L3SWICH_USER.encode('ascii') + b"\n")
+    if L3SWICH_PASSWORD:
         tn.read_until(b"Password: ")
-        tn.write(PASSWORD.encode('ascii') + b"\n")
+        tn.write(L3SWICH_PASSWORD.encode('ascii') + b"\n")
 
     tn.write(b"sys\n")
     vlan_command = b"dhcp server ip-pool %s\n" % (vlan.encode('ascii'))
@@ -39,17 +35,13 @@ def bind_mac_ip(mac, vlan, ip):
 
 def undo_bind_mac_ip(vlan,ip):
     """Remove mac and ip address binding from layer 3 switch"""
-    HOST = "172.16.10.253"
-    user = "admin"
-    password = "admin"
-
-    tn = telnetlib.Telnet(HOST)
-
+    tn = telnetlib.Telnet(L3SWICH_HOST)
+    vlan = 'vlan'+vlan
     tn.read_until(b"login: ")
-    tn.write(user.encode('ascii') + b"\n")
-    if password:
+    tn.write(L3SWICH_USER.encode('ascii') + b"\n")
+    if L3SWICH_PASSWORD:
         tn.read_until(b"Password: ")
-        tn.write(password.encode('ascii') + b"\n")
+        tn.write(L3SWICH_PASSWORD.encode('ascii') + b"\n")
 
     tn.write(b"sys\n")
     vlan_command = b"dhcp server ip-pool %s\n" % (vlan.encode('ascii'))
@@ -139,18 +131,13 @@ def dns_parsor(line):
 
 def permit_ip(rule_num, ip):
     """Permits certain ip on firewall"""
-
-    HOST = "172.16.10.254"
-    user = "admin"
-    password = "admin"
-
-    tn = telnetlib.Telnet(HOST)
+    tn = telnetlib.Telnet(FIREWALL_HOST)
  
     tn.read_until(b"login: ")
-    tn.write(user.encode('ascii') + b"\n")
-    if password:
+    tn.write(FIREWALL_USER.encode('ascii') + b"\n")
+    if FIREWALL_PASSWORD:
         tn.read_until(b"Password: ")
-        tn.write(password.encode('ascii') + b"\n")
+        tn.write(FIREWALL_PASSWORD.encode('ascii') + b"\n")
 
     permit_command = b"rule %s permit ip source %s 0\n" % (rule_num.encode('ascii'), ip.encode('ascii'))
     tn.write(b"sys\n")
@@ -165,17 +152,12 @@ def permit_ip(rule_num, ip):
 
 def undo_permit_ip(rule_num):
     """Un-permit ip from firewall"""
-    HOST = "172.16.10.254"
-    user = "admin"
-    password = "admin"
-
-    tn = telnetlib.Telnet(HOST)
- 
+    tn = telnetlib.Telnet(FIREWALL_HOST)
     tn.read_until(b"login: ")
-    tn.write(user.encode('ascii') + b"\n")
-    if password:
+    tn.write(FIREWALL_USER.encode('ascii') + b"\n")
+    if FIREWALL_PASSWORD:
         tn.read_until(b"Password: ")
-        tn.write(password.encode('ascii') + b"\n")
+        tn.write(FIREWALL_PASSWORD.encode('ascii') + b"\n")
     undo_command = b'undo rule %s\n' % (rule_num.encode('ascii'))
     tn.write(b"sys\n")
     tn.write(b"acl advanced 3002\n")
@@ -235,3 +217,5 @@ def permit_rule_parsor(line):
 
 if __name__ == "__main__":
     print("test! test! test!")
+    undo_bind_mac_ip("vlan11","192.168.11.8")
+    bind_mac_ip("6c2b-5956-90c5","11","192.168.11.8")
