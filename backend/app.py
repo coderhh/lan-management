@@ -6,6 +6,14 @@ CORS(app)
 
 @app.route('/lan/api/v1.0/vlan/<string:vlan_id>', methods=['GET'])
 def get_mac_ip_bind(vlan_id):
+    """[summary]
+
+    Args:
+        vlan_id ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     vlan = get_vlan('vlan'+vlan_id)
     return jsonify(vlan)
 
