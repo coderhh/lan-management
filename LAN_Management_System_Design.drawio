@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2022-01-17T06:57:27.979Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36" etag="NKSZ31GEZfGk8BAdA3MX" version="16.2.7" type="github" pages="2">
+<mxfile host="app.diagrams.net" modified="2022-01-17T06:58:12.352Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36" etag="Wr2EYOernI_0ztsgipEh" version="16.2.7" type="github" pages="2">
   <diagram id="MhVaJP69Vs2sh0BpgL6X" name="Simple">
     <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="#283618" math="0" shadow="0">
       <root>
@@ -51,9 +51,9 @@
       <root>
         <mxCell id="1WadzQbD6iXASirldq2q-0" />
         <mxCell id="1WadzQbD6iXASirldq2q-1" parent="1WadzQbD6iXASirldq2q-0" />
-        <object placeholders="1" c4Name="Person name" c4Type="Person" c4Description="Description of person." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="_Tpn7A33pFpfnWc1HHbV-0">
+        <object placeholders="1" c4Name="LAN Admin" c4Type="Person" c4Description="Peron who manages LAN" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="_Tpn7A33pFpfnWc1HHbV-0">
           <mxCell style="html=1;fontSize=11;dashed=0;whitespace=wrap;fillColor=#083F75;strokeColor=#06315C;fontColor=#ffffff;shape=mxgraph.c4.person2;align=center;metaEdit=1;points=[[0.5,0,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0]];resizable=0;" vertex="1" parent="1WadzQbD6iXASirldq2q-1">
-            <mxGeometry x="190" y="350" width="200" height="180" as="geometry" />
+            <mxGeometry x="60" y="160" width="200" height="180" as="geometry" />
           </mxCell>
         </object>
       </root>
