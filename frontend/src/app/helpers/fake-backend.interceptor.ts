@@ -35,8 +35,8 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       switch (true){
           case url.endsWith('/authenticate') && method === 'POST':
               return authenticate();
-          // case url.endsWith('/accounts/refresh-token') && method === 'POST':
-          //     return refreshToken();
+          case url.endsWith('/refresh-token') && method === 'POST':
+              return refreshToken();
           // case url.endsWith('/accounts/revoke-token') && method === 'POST':
           //     return revokeToken();
           // case url.endsWith('/accounts/register') && method === 'POST':
@@ -62,6 +62,31 @@ export class FakeBackendInterceptor implements HttpInterceptor {
           ...basicDetails(account),
           jwtToken: generateJwtToken(account)
       });
+    }
+
+    function refreshToken() {
+      const refreshToken  = getRefreshToken();
+
+      if (!refreshToken) return unauthorized();
+
+      const account = accounts.find(x => x.refreshTokens.includes(refreshToken));
+
+      if (!account) return unauthorized();
+
+      // replace old refresh token with a new one and save
+      account.refreshTokens = account.refreshTokens.filter((x: string) => x !== refreshToken);
+      account.refreshTokens.push(generateRefreshToken());
+      localStorage.setItem(accountsKey, JSON.stringify(accounts));
+
+      return ok({
+          ...basicDetails(account),
+          jwtToken: generateJwtToken(account)
+      });
+    }
+
+    function getRefreshToken(): string {
+      // get refresh token from cookie
+      return (document.cookie.split(';').find(x => x.includes('fakeRefreshToken')) || '=').split('=')[1];
     }
 
     function error(message: string) {
@@ -97,6 +122,12 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       return of(new HttpResponse( { status: 200, body}))
           .pipe(delay(500));
     }
+
+
+    function unauthorized(): Observable<any> {
+       return throwError({status: 401, error: { message: 'Unauthorized'}})
+              .pipe(materialize(), delay(500), dematerialize());
+    }
   }
 }
 
@@ -105,4 +136,6 @@ export let fakeBackendProvider = {
   useClass: FakeBackendInterceptor,
   multi: true
 };
+
+
 

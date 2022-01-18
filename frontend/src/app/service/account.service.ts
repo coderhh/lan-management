@@ -11,12 +11,9 @@ const baseUrl = `${environment.apiUrl}`;
   providedIn: 'root'
 })
 export class AccountService {
-  logout() {
-    throw new Error("Method not implemented.");
-  }
 
-  constructor(private http: HttpClient, router: Router) {
-    this.accountSubject = new BehaviorSubject<Account>(new Account);
+  constructor(private http: HttpClient, private router: Router) {
+    this.accountSubject = new BehaviorSubject<Account>(new Account());
     this.account = this.accountSubject.asObservable();
   }
 
@@ -35,6 +32,16 @@ export class AccountService {
             this.startRefreshTokenTimer();
             return account;
           }));
+  }
+
+  logout(){
+    this.http.post<any>(`${baseUrl}/revoke-token`, {}, { withCredentials: true}).subscribe();
+    this.stopRefreshTokenTimer();
+    this.accountSubject.next(new Account());
+    this.router.navigate(['/login']);
+  }
+  stopRefreshTokenTimer() {
+    clearTimeout(this.refreshTokenTimeout);
   }
 
   refreshToken() {

@@ -29,7 +29,7 @@ export class VlanComponent implements OnInit, AfterViewInit {
 
   vlan: any;
 
-  vlanNum: string;
+  vlanNum: string = '10';
 
   vlanName = '';
 
@@ -43,8 +43,8 @@ export class VlanComponent implements OnInit, AfterViewInit {
 
   dataSource = new MatTableDataSource<MacIpBind>();
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private lanService: LanService, private route: ActivatedRoute) {
     this.lanSubs = new Subscription();

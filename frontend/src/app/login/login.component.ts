@@ -11,7 +11,7 @@ import { AlertService } from '../service/alert.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  loginForm: FormGroup;
+  loginForm!: FormGroup;
   loading = false;
   submitted = false;
   constructor(
