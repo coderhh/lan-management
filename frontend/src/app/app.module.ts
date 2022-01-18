@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,6 +21,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FirewallComponent } from './firewall/firewall.component';
 import { NewRuleComponent } from './new-rule/new-rule.component';
 import { NewBindComponent } from './new-bind/new-bind.component';
+import { LoginComponent } from './login/login.component';
+import { AlertComponent } from './alert/alert.component';
+import { fakeBackendProvider } from './helpers/fake-backend.interceptor';
+import { ErrorInterceptor } from './helpers/error.interceptor';
 
 
 
@@ -31,7 +35,9 @@ import { NewBindComponent } from './new-bind/new-bind.component';
     VlanComponent,
     FirewallComponent,
     NewRuleComponent,
-    NewBindComponent
+    NewBindComponent,
+    LoginComponent,
+    AlertComponent
   ],
   imports: [
     BrowserModule,
@@ -50,7 +56,10 @@ import { NewBindComponent } from './new-bind/new-bind.component';
     MatInputModule,
     ReactiveFormsModule
   ],
-  providers: [LanService],
+  providers: [LanService,
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    fakeBackendProvider
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

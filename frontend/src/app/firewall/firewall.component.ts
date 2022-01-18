@@ -16,12 +16,12 @@ export class FirewallComponent implements OnInit, AfterViewInit {
   res: any;
   rules: FireWallRule[] = [];
 
-  lanSubs: Subscription;
+  lanSubs: Subscription = new Subscription();
 
   displayedColumns: string[] = ['rule_num', 'ip', 'action'];
   dataSource = new MatTableDataSource<FireWallRule>();
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
   constructor(public _lanService: LanService, private router: Router) {
 
   }
