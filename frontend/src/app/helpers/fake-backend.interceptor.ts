@@ -17,7 +17,7 @@ let accounts: any[] = [];
 if (accountsKeyStr !== null){
   accounts = JSON.parse(accountsKeyStr);
 } else {
-  accounts = [];
+  accounts.push({email: 'yehanghan@gmail.com', password:'12345678', isVerified: true, refreshTokens: []});
 }
 
 @Injectable()
@@ -94,7 +94,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
           .pipe(materialize(), delay(500), dematerialize());
     }
 
-    function generateRefreshToken() {
+    function generateRefreshToken(): string {
       const token = new Date().getTime().toString();
 
       // add token cookie that expires in 7 days
