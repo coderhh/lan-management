@@ -11,7 +11,9 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatOptionModule } from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LanService } from './service/lan.service';
@@ -25,8 +27,10 @@ import { LoginComponent } from './login/login.component';
 import { AlertComponent } from './alert/alert.component';
 import { fakeBackendProvider } from './helpers/fake-backend.interceptor';
 import { ErrorInterceptor } from './helpers/error.interceptor';
-
-
+import { AdminComponent } from './admin/admin.component';
+import { AccountsListComponent } from './accounts-list/accounts-list.component';
+import { JwtInterceptor } from './helpers/jwt.interceptor';
+import { AccountsAddEditComponent } from './accounts-add-edit/accounts-add-edit.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +41,10 @@ import { ErrorInterceptor } from './helpers/error.interceptor';
     NewRuleComponent,
     NewBindComponent,
     LoginComponent,
-    AlertComponent
+    AlertComponent,
+    AdminComponent,
+    AccountsListComponent,
+    AccountsAddEditComponent
   ],
   imports: [
     BrowserModule,
@@ -50,14 +57,17 @@ import { ErrorInterceptor } from './helpers/error.interceptor';
     MatPaginatorModule,
     MatSortModule,
     MatCardModule,
+    MatOptionModule,
     MatProgressSpinnerModule,
     MatTableModule,
     MatFormFieldModule,
     MatInputModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatSelectModule
   ],
   providers: [LanService,
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     fakeBackendProvider
   ],
   bootstrap: [AppComponent]

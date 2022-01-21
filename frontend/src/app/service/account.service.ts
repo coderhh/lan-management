@@ -4,9 +4,9 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Account } from '../models/account';
 import { environment } from '../../environments/environment';
-import { map } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 
-const baseUrl = `${environment.apiUrl}`;
+const baseUrl = `${environment.apiUrl}/accounts`;
 @Injectable({
   providedIn: 'root'
 })
@@ -40,6 +40,42 @@ export class AccountService {
     this.accountSubject.next(new Account());
     this.router.navigate(['/login']);
   }
+
+  getAll(){
+    return this.http.get<Account[]>(baseUrl);
+  }
+
+  getById(id: string)
+  {
+    return this.http.get<Account>(`${baseUrl}/${id}`);
+  }
+
+  create(params: object)
+  {
+    return this.http.post(baseUrl, params);
+  }
+
+  update(id:string, params: object)
+  {
+    return this.http.put(`${baseUrl}/${id}`, params)
+        .pipe(map((account: any) => {
+          if(account.id === this.accountValue.id)
+          {
+            account = { ...this.accountValue, ...account };
+            this.accountSubject.next(account);
+          }
+          return account;
+        }));
+  }
+
+  delete(id: string)
+  {
+    return this.http.delete(`${baseUrl}/${id}`)
+        .pipe(finalize(() => {
+          if(id === this.accountValue.id)
+            this.logout();
+        }));
+  }
   stopRefreshTokenTimer() {
     clearTimeout(this.refreshTokenTimeout);
   }
@@ -63,4 +99,5 @@ export class AccountService {
       this.refreshTokenTimeout = setTimeout(() => this.refreshToken().subscribe(), timeout);
     }
   }
+
 }

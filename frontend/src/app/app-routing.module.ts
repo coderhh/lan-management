@@ -7,6 +7,8 @@ import { NewBindComponent } from './new-bind/new-bind.component';
 import { VlanComponent } from './vlan/vlan.component';
 import { AuthGuard } from './helpers/auth.guard';
 import { LoginComponent } from './login/login.component';
+import { AdminComponent } from './admin/admin.component';
+import { AccountsAddEditComponent } from './accounts-add-edit/accounts-add-edit.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full'},
@@ -15,7 +17,10 @@ const routes: Routes = [
   { path: 'firewall', component: FirewallComponent },
   { path: 'firewall/new', component: NewRuleComponent, canActivate: [AuthGuard]},
   { path: 'bind', component: NewBindComponent, canActivate: [AuthGuard] },
-  { path: 'login', component: LoginComponent}
+  { path: 'login', component: LoginComponent},
+  { path: 'admin', component: AdminComponent, canActivate: [AuthGuard]},
+  { path: 'admin/edit/:id', component: AccountsAddEditComponent },
+  { path: 'admin/add', component: AccountsAddEditComponent}
 ];
 
 @NgModule({
