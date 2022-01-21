@@ -10,9 +10,8 @@ export class AuthGuard implements CanActivate {
   ){ }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    // TODO implement real auth login
     const account = this.accountService.accountValue;
-    if(account)
+    if(account.email)
     {
        // check if route is restricted by role
       if (route.data.roles && !route.data.roles.includes(account.role)){

@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit {
         .pipe(first())
         .subscribe({
           next: () => {
-            const returnUrl = this.route.snapshot.params.returnUrl || '/';
+            const returnUrl = this.route.snapshot.params.returnUrl || '/admin';
             this.router.navigateByUrl(returnUrl);
           },
           error: error => {

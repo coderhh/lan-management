@@ -10,6 +10,7 @@ import {
 import { Observable, of, throwError } from 'rxjs';
 import { AlertService } from '../service/alert.service';
 import { delay, dematerialize, materialize } from 'rxjs/operators';
+import { Role } from '../models/role';
 
 const accountsKey = 'lan-accounts';
 const accountsKeyStr = localStorage.getItem(accountsKey);
@@ -17,7 +18,7 @@ let accounts: any[] = [];
 if (accountsKeyStr !== null){
   accounts = JSON.parse(accountsKeyStr);
 } else {
-  accounts.push({email: 'yehanghan@gmail.com', password:'12345678', isVerified: true, refreshTokens: []});
+  accounts.push({id: 1, firstName:'yehang', lastName:'han', Role:'Admin', email: 'yehanghan@gmail.com', password:'12345678', isVerified: true, refreshTokens: []});
 }
 
 @Injectable()
@@ -34,15 +35,21 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     function handleRoute() {
       switch (true){
           case url.endsWith('/authenticate') && method === 'POST':
-              return authenticate();
+            return authenticate();
           case url.endsWith('/refresh-token') && method === 'POST':
-              return refreshToken();
-          // case url.endsWith('/accounts/revoke-token') && method === 'POST':
-          //     return revokeToken();
-          // case url.endsWith('/accounts/register') && method === 'POST':
-          //     return register();
-          // case url.endsWith('/accounts/verify-email') && method === 'POST':
-          //     return verifyEmail();
+            return refreshToken();
+          case url.endsWith('/revoke-token') && method === 'POST':
+            return revokeToken();
+          case url.endsWith('/accounts') && method === 'GET':
+            return getAccounts();
+          case url.match(/\/accounts\/\d+$/) && method === 'GET':
+            return getAccountById();
+          case url.endsWith('/accounts') && method === 'POST':
+            return createAccount();
+          case url.match(/\/accounts\/\d+$/) && method === 'PUT':
+            return updateAccount();
+          case url.match(/\/accounts\/\d+$/) && method === 'DELETE':
+            return deleteAccount();
           default:
               return next.handle(request);
       }
@@ -84,10 +91,120 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       });
     }
 
+    function revokeToken(){
+      if(!isAuthenticated()) return unauthorized();
+
+      const refreshToken = getRefreshToken();
+      const account = accounts.find(x => x.refreshTokens.includes(refreshToken));
+
+      //revoke token and save
+      account.refreshTokens = account.refreshTokens.filter((x: string) => x !== refreshToken);
+      localStorage.setItem(accountsKey, JSON.stringify(accounts));
+      return ok();
+    }
+    function getAccounts(){
+      if (!isAuthenticated()) return unauthorized();
+      return ok(accounts.map(x => basicDetails(x)));
+    }
+
+    function getAccountById(){
+      if (!isAuthenticated()) return unauthorized();
+
+      let account = accounts.find(x => x.id === idFromUrl());
+
+      if (account.id !== currentAccount().id && !isAuthorized(Role.Admin)) {
+        return unauthorized();
+      }
+
+      return ok(basicDetails(account));
+
+    }
+
+    function createAccount(){
+      if (!isAuthorized(Role.Admin)) return unauthorized();
+      const account = body;
+      if (accounts.find(x => x.email === account.email)){
+        return error(`Email ${account.email} is already registered`);
+      }
+
+      account.id = newAccountId();
+      account.dateCreated = new Date().toISOString();
+      account.isVerified = true;
+      account.refreshTokens = [];
+      delete account.confirmPassword;
+      accounts.push(account);
+      localStorage.setItem(accountsKey, JSON.stringify(accounts));
+
+      return ok();
+    }
+
+    function updateAccount(){
+      if(!isAuthenticated()) return unauthorized();
+
+      let params = body;
+      let account = accounts.find(x => x.id === idFromUrl());
+
+      if(account.id !== currentAccount().id && !isAuthorized(Role.Admin)) {
+        return unauthorized();
+      }
+      // only update password if included
+      if(!params.password)
+      {
+        delete params.password;
+      }
+      // don't save confirm password
+      delete params.confirmPassword;
+
+      // update and save account
+      Object.assign(account, params);
+      localStorage.setItem(accountsKey, JSON.stringify(accounts));
+
+      return ok(basicDetails(account));
+    }
+    function deleteAccount(){
+      if(!isAuthenticated()) return unauthorized();
+      let account = accounts.find(x => x.id === idFromUrl());
+
+      if (account.id !== currentAccount().id && !isAuthorized(Role.Admin))
+      {
+        return unauthorized();
+      }
+
+      // delete account then save
+      accounts = accounts.filter(x => x.id !== idFromUrl());
+      localStorage.setItem(accountsKey, JSON.stringify(accounts));
+
+      return ok();
+    }
     function getRefreshToken(): string {
       // get refresh token from cookie
       return (document.cookie.split(';').find(x => x.includes('fakeRefreshToken')) || '=').split('=')[1];
     }
+    function isAuthenticated() {
+      return !!currentAccount();
+    }
+    function isAuthorized(role: Role)
+    {
+      const account = currentAccount();
+      if(!account) return false;
+      return account.role === role;
+    }
+    function newAccountId(): number {
+      return accounts.length ? Math.max(...accounts.map(x => x.id)) + 1 : 1;
+    }
+    function currentAccount(): any {
+      // check if jwt token is in auth header
+      const authHeader = headers.get('Authorization');
+      if (!authHeader?.startsWith('Bear fake-jwt-token')) return;
+
+      // check if token is expired
+      const jwtToken = JSON.parse(atob(authHeader.split('.')[1]));
+      const tokenExpired = Date.now() > (jwtToken.exp * 1000);
+      if (tokenExpired) return;
+
+      const account = accounts.find(x => x.id === jwtToken.id);
+      return account;
+  }
 
     function error(message: string) {
       return throwError({ error: { message }})
@@ -104,10 +221,10 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       return token;
     }
 
-    function generateJwtToken(account: { id: any; }) {
+    function generateJwtToken(account: { id: number; }) {
       // create token that expires in 15 minutes
       const tokenPayload = {
-          exp: Math.round(new Date(Date.now() * 15 * 60 * 1000).getTime() / 1000),
+          exp: Math.round(new Date(Date.now() + 15 * 60 * 1000).getTime() / 1000),
           id: account.id
       };
       return `fake-jwt-token.${btoa(JSON.stringify(tokenPayload))}`;
@@ -127,6 +244,12 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     function unauthorized(): Observable<any> {
        return throwError({status: 401, error: { message: 'Unauthorized'}})
               .pipe(materialize(), delay(500), dematerialize());
+    }
+
+    function idFromUrl()
+    {
+      const urlParts = url.split('/');
+      return parseInt(urlParts[urlParts.length - 1]);
     }
   }
 }

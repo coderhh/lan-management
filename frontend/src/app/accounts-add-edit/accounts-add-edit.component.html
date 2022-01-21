@@ -1,0 +1,78 @@
+<mat-card>
+  <mat-card-title *ngIf="isAddMode">Create Account</mat-card-title>
+  <mat-card-title *ngIf="!isAddMode">Edit Account</mat-card-title>
+  <mat-card-content>
+      <form [formGroup]="addEditForm" (ngSubmit)="onSubmit()">
+          <p>
+              <mat-form-field>
+                  <input type="text" matInput formControlName="firstName" placeholder="FirstName" name="firstName" required>
+                  <mat-error *ngIf="submitted && f.firstName.errors">
+                      <mat-error *ngIf="f.firstName.errors.required">FirstName is required</mat-error>
+                  </mat-error>
+              </mat-form-field>
+          </p>
+          <p>
+              <mat-form-field>
+                  <input type="text" matInput placeholder="LastName" formControlName="lastName"/>
+                  <mat-error *ngIf="submitted && f.lastName.errors">
+                      <mat-error *ngIf="f.lastName.errors.required">Last Name is required</mat-error>
+                  </mat-error>
+              </mat-form-field>
+          </p>
+          <p>
+              <mat-form-field>
+                  <input type="text" matInput formControlName="email" placeholder="Email" required/>
+                  <mat-error *ngIf="submitted && f.email.errors">
+                      <mat-error *ngIf="f.email.errors.required">Email is required</mat-error>
+                      <mat-error *ngIf="f.email.errors.email">Email must be a valid email address</mat-error>
+                  </mat-error>
+              </mat-form-field>
+          </p>
+           <p>
+              <mat-form-field appearance="fill">
+                  <mat-label>Role</mat-label>
+                  <mat-select formControlName="role" name="role">
+                      <mat-option>---</mat-option>
+                      <mat-option *ngFor="let role of roles" [value]="role.value">
+                          {{role.viewValue}}
+                      </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="submitted && f.role.errors">
+                      <mat-error *ngIf="f.role.errors.required">Role is required</mat-error>
+                  </mat-error>
+              </mat-form-field>
+          </p>
+
+          <div *ngIf="!isAddMode">
+              <h3>Change Password</h3>
+              <p>Leave blank to keep the same password</p>
+          </div>
+
+          <p>
+              <mat-form-field>
+                  <input type="password" matInput formControlName="password" placeholder="Password" />
+                  <mat-error *ngIf="submitted && f.password.errors">
+                      <mat-error *ngIf="f.password.errors.required">Password is required</mat-error>
+                      <mat-error *ngIf="f.password.errors.minlength">Password must be at least 6 characters</mat-error>
+                  </mat-error>
+              </mat-form-field>
+          </p>
+          <p>
+              <mat-form-field>
+                  <input type="password" matInput formControlName="confirmPassword" placeholder="ConfirmPassword" />
+                  <mat-error *ngIf="submitted && f.confirmPassword.errors">
+                      <mat-error *ngIf="f.confirmPassword.errors.required">Confirm Password is required</mat-error>
+                      <mat-error *ngIf="f.confirmPassword.errors.mustMatch">Password must match</mat-error>
+                  </mat-error>
+              </mat-form-field>
+          </p>
+          <p>
+              <button mat-flat-button type="submit" [disabled]="loading">
+                  <span *ngIf="loading"></span>
+                  Save
+              </button>
+              <a mat-flat-button routerLink="/admin">Cancel</a>
+          </p>
+      </form>
+  </mat-card-content>
+</mat-card>
