@@ -1,4 +1,3 @@
-
 <div class="example-container mat-elevation-z8">
     <h3>DNS</h3>
     <div *ngFor="let dns of dns_list">
@@ -8,52 +7,53 @@
     <div *ngFor="let gateway of gateway_list">
         <p>{{gateway}}</p>
     </div>
-    
+
     <div class="example-loading-shade" *ngIf="static_bind.length === 0">
         <mat-spinner *ngIf="static_bind.length === 0"></mat-spinner>
     </div>
-    
+
     <div class="example-table-container">
         <mat-form-field>
             <mat-label>Filter</mat-label>
             <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
         </mat-form-field>
-        
-        <table mat-table [dataSource]="dataSource" class="example-table" 
+
+        <table mat-table [dataSource]="dataSource" class="example-table"
                 matSort matSortDisableClear>
             <!-- Vlanname Column -->
             <ng-container matColumnDef="vlan">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear> VLAN </th>
-                <td mat-cell *matCellDef="let element"> {{element.vlan}} </td>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear> VLAN </th>
+              <td mat-cell *matCellDef="let element"> {{element.vlan}} </td>
             </ng-container>
             <!-- Mac Column -->
             <ng-container matColumnDef="mac">
-            <th mat-header-cell *matHeaderCellDef> MAC </th>
-            <td mat-cell *matCellDef="let element"> {{element.mac}} </td>
+              <th mat-header-cell *matHeaderCellDef> MAC </th>
+              <td mat-cell *matCellDef="let element"> {{element.mac}} </td>
             </ng-container>
-        
+
             <!-- IP Column -->
             <ng-container matColumnDef="ip">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear> IP </th>
-            <td mat-cell *matCellDef="let element"> {{element.ip}} </td>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear> IP </th>
+              <td mat-cell *matCellDef="let element"> {{element.ip}} </td>
             </ng-container>
-        
+
             <!-- Mask Column -->
             <ng-container matColumnDef="mask">
-            <th mat-header-cell *matHeaderCellDef> MASK </th>
-            <td mat-cell *matCellDef="let element"> {{element.mask}} </td>
+              <th mat-header-cell *matHeaderCellDef> MASK </th>
+              <td mat-cell *matCellDef="let element"> {{element.mask}} </td>
             </ng-container>
 
             <!-- Action Column -->
             <ng-container matColumnDef="action">
                 <th mat-header-cell *matHeaderCellDef> ACTION </th>
-                <td mat-cell *matCellDef="let element"> 
-                    <button mat-mini-fab color="warn" type="button" (click)="deleteBind(element.ip)">
-                       <mat-icon>delete</mat-icon>
-                    </button> </td>
-                </ng-container>
-            
-        
+                <td mat-cell *matCellDef="let element">
+                    <a mat-flat-button routerLink="edit/{{element.id}}" class="action-link">Edit</a>
+                    <button (click)="deleteBind(element.id)" class="action-link">
+                       <span>delete</span>
+                    </button>
+                </td>
+            </ng-container>
+
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 

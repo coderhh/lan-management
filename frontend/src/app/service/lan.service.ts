@@ -6,6 +6,7 @@ import { BASE_API_URL } from '../env';
 import { FireWallRule } from '../vlan/firewallrule';
 import { Bind } from '../new-bind/bind';
 import { environment } from '../../environments/environment';
+import { MacIpBind } from '../vlan/vlan.component';
 
 const baseUrl = `${environment.apiUrl}/lan`;
 @Injectable({
@@ -21,12 +22,11 @@ export class LanService {
     return Observable.throw(err.message || 'Error: Unable to complete request.');
   }
 
-  getVlan(vlanNum: string){
-    return this.http
-      .get(`${baseUrl}/lan/api/v1.0/vlan/` + vlanNum)
-      .pipe(
-          catchError(LanService._handleError)
-      );
+  // getVlan(vlanNum: string){
+  //   return this.http.get(`${baseUrl}/vlan/${vlanNum}`);
+  // }
+  getVlan(){
+    return this.http.get<MacIpBind[]>(`${baseUrl}/vlan`);
   }
 
   getFireWallRules() {
@@ -61,12 +61,7 @@ export class LanService {
     );
   }
 
-  deleteBind(bind: Bind) {
-    console.log(bind);
-    return this.http
-    .post(`${baseUrl}/lan/api/v1.0/vlan/delete/`, bind)
-    .pipe(
-      catchError(LanService._handleError)
-    );
+  deleteBind(bindId: string) {
+    return this.http.delete(`${baseUrl}/vlan/${bindId}`);
   }
 }

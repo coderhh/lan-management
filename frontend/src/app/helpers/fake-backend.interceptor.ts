@@ -41,6 +41,30 @@ else
   }
 }
 
+const lanVlanBindingKey = 'lan-vlanbinding';
+const lanVlanBindingKeyStr = localStorage.getItem(lanVlanBindingKey);
+let vlanBindings: any[] = [];
+if (lanVlanBindingKeyStr !== null){
+  vlanBindings = JSON.parse(lanVlanBindingKeyStr);
+}
+else
+{
+  for (let i = 0; i < 100; i++){
+    if(i < 30)
+    {
+      vlanBindings.push({id: i, vlan: 10, mac: 'xxxx-xxxx-xxxx-xxxx', ip: '192.168.10.'+i, mask: '255.255.255.255' });
+    }
+    else if (i < 60)
+    {
+      vlanBindings.push({id: i, vlan: 11, mac: 'xxxx-xxxx-xxxx-xxxx', ip: '192.168.11.'+i, mask: '255.255.255.255' });
+    }
+    else
+    {
+      vlanBindings.push({id: i, vlan: 13, mac: 'xxxx-xxxx-xxxx-xxxx', ip: '192.168.13.'+i, mask: '255.255.255.255' });
+    }
+  }
+}
+
 
 
 @Injectable()
@@ -82,6 +106,10 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             return deleteFirewallRule();
           case url.match(/\/firewall\/\d+$/) && method === 'PUT':
               return updateRule();
+          case url.endsWith('/vlan') && method === 'GET':
+              return getVlanBindings();
+          case url.match(/\/vlan\/\d+$/) && method === 'DELETE':
+              return deleteVlanBind();
           default:
               return next.handle(request);
       }
@@ -249,6 +277,19 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       firewallRules.push(rule);
       localStorage.setItem(lanFirewallKey, JSON.stringify(firewallRules));
       return ok();
+    }
+    function getVlanBindings(){
+      if(!isAuthenticated()) return unauthorized();
+      return ok(vlanBindings);
+    }
+    function deleteVlanBind(){
+      if(!isAuthenticated()) return unauthorized();
+
+      vlanBindings = vlanBindings.filter(x => x.id !== idFromUrl());
+      localStorage.setItem(lanVlanBindingKey,JSON.stringify(vlanBindings));
+
+      return ok();
+
     }
     function getRefreshToken(): string {
       // get refresh token from cookie
