@@ -1,17 +1,16 @@
-
 <div class="example-container mat-elevation-z8">
-    <h3>FIREWALL</h3>
+    <h3>Firewall</h3>
+    <a mat-flat-button routerLink="add" color="primary">Create New Firewall Rule</a>
     <div class="example-loading-shade" *ngIf="rules.length === 0">
         <mat-spinner *ngIf="rules.length === 0"></mat-spinner>
     </div>
-    
+
     <div class="example-table-container">
         <mat-form-field>
             <mat-label>Filter</mat-label>
             <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
         </mat-form-field>
-        
-        <table mat-table [dataSource]="dataSource" class="example-table" 
+        <table mat-table [dataSource]="dataSource" class="example-table"
                 matSort matSortDisableClear>
             <!-- Firewall Rule Column -->
             <ng-container matColumnDef="rule_num">
@@ -27,13 +26,21 @@
             <!-- IP Column -->
             <ng-container matColumnDef="action">
                 <th mat-header-cell *matHeaderCellDef> ACTION </th>
-                <td mat-cell *matCellDef="let element">
-                    <button mat-mini-fab color="warn" type="button" (click)="deleteRule(element.rule_num)">
+                <td mat-cell *matCellDef="let element" class="action-link">
+                      <!-- <button mat-mini-fab color="warn" type="button" (click)="deleteRule(element.rule_num)">
                         <mat-icon>delete</mat-icon>
-                    </button>
+                      </button>
+
+                      <button mat-mini-fab color="warn" type="button" (click)="editRule(element.rule_num)">
+                        <mat-icon>edit</mat-icon>
+                      </button> -->
+                      <a mat-flat-button routerLink="edit/{{element.rule_num}}">Edit</a>
+                      <button mat-flat-fab (click)="deleteRule(element.rule_num)">
+                        <span>Delete</span>
+                      </button>
                 </td>
             </ng-container>
-        
+
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 

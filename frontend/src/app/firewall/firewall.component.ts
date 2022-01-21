@@ -5,7 +5,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Subscription } from 'rxjs';
-import { NavigationEnd, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-firewall',
@@ -22,7 +23,7 @@ export class FirewallComponent implements OnInit, AfterViewInit {
   dataSource = new MatTableDataSource<FireWallRule>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  constructor(public _lanService: LanService, private router: Router) {
+  constructor(public lanService: LanService, private router: Router) {
 
   }
 
@@ -36,21 +37,17 @@ export class FirewallComponent implements OnInit, AfterViewInit {
   }
 
   load(): void {
-    this._lanService.getFireWallRules()
-      .subscribe(res => {
-        this.res = res;
-        for (const rule of this.res.rules) {
-          this.rules.push({rule_num: rule.rule_num, ip_address: rule.ip_address});
-        }
-        this.dataSource.data = this.rules;
-      },
-      console.error
-      );
+      this.lanService.getFireWallRules()
+        .pipe(first())
+        .subscribe(rules => {
+          this.rules = rules;
+          this.dataSource.data = this.rules;
+        });
   }
 
-  deleteRule(ruleNum: any) {
+  deleteRule(ruleNum: string) {
     // this.isLoadingResults = true;
-    this._lanService.deleteRule(ruleNum)
+    this.lanService.deleteRule(ruleNum)
       .subscribe(res => {
           // this.isLoadingResults = false;
           console.log(res);
@@ -60,6 +57,10 @@ export class FirewallComponent implements OnInit, AfterViewInit {
           // this.isLoadingResults = false;
         }
       );
+  }
+  editRule(ruleNum: string){
+    let editUrl = 'edit/'+ ruleNum;
+    this.router.navigateByUrl(editUrl);
   }
 
   applyFilter(event: Event) {

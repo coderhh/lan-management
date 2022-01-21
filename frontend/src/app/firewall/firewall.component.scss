@@ -4,16 +4,16 @@
     position: relative;
     min-height: 200px;
   }
-  
+
   .example-table-container {
     position: relative;
     overflow: auto;
   }
-  
+
   table {
     width: 100%;
   }
-  
+
   .example-loading-shade {
     position: absolute;
     top: 0;
@@ -26,7 +26,7 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   /* Column Widths */
   .mat-column-number,
   .mat-column-state {

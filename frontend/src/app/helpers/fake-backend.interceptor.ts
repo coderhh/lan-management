@@ -18,8 +18,30 @@ let accounts: any[] = [];
 if (accountsKeyStr !== null){
   accounts = JSON.parse(accountsKeyStr);
 } else {
-  accounts.push({id: 1, firstName:'yehang', lastName:'han', Role:'Admin', email: 'yehanghan@gmail.com', password:'12345678', isVerified: true, refreshTokens: []});
+  accounts.push({
+    id: 1,
+    firstName:'yehang',
+    lastName:'han',
+    Role:'Admin',
+    email: 'yehanghan@gmail.com',
+    password:'12345678',
+    isVerified: true,
+    refreshTokens: []});
 }
+const lanFirewallKey = 'lan-firewall';
+const lanFirewallKeyStr = localStorage.getItem(lanFirewallKey);
+let firewallRules: any[] = [];
+if (lanFirewallKeyStr !== null){
+  firewallRules = JSON.parse(lanFirewallKeyStr);
+}
+else
+{
+  for (let i = 0; i < 100; i++){
+    firewallRules.push({rule_num: i, ip_address: '192.168.10.'+i});
+  }
+}
+
+
 
 @Injectable()
 export class FakeBackendInterceptor implements HttpInterceptor {
@@ -50,6 +72,16 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             return updateAccount();
           case url.match(/\/accounts\/\d+$/) && method === 'DELETE':
             return deleteAccount();
+          case url.endsWith('/firewall') && method === 'GET':
+            return getFireWallRules();
+          case url.endsWith('/firewall') && method === 'POST':
+            return createRule();
+          case url.match(/\/firewall\/\d+$/) && method === 'GET':
+            return getFireWallRuleById();
+          case url.match(/\/firewall\/\d+$/) && method === 'DELETE':
+            return deleteFirewallRule();
+          case url.match(/\/firewall\/\d+$/) && method === 'PUT':
+              return updateRule();
           default:
               return next.handle(request);
       }
@@ -174,6 +206,48 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       accounts = accounts.filter(x => x.id !== idFromUrl());
       localStorage.setItem(accountsKey, JSON.stringify(accounts));
 
+      return ok();
+    }
+
+    function getFireWallRules(){
+      if(!isAuthenticated()) return unauthorized();
+      return ok(firewallRules);
+    }
+    function getFireWallRuleById() {
+      if(!isAuthenticated()) return unauthorized();
+
+      let rule = firewallRules.find(rule => rule.rule_num === idFromUrl());
+      return ok(rule);
+    }
+    function deleteFirewallRule(){
+      if (!isAuthenticated()) return unauthorized();
+
+      // delete firewall rule and save
+      firewallRules = firewallRules.filter(rule => rule.rule_num !== idFromUrl());
+      localStorage.setItem(lanFirewallKey,JSON.stringify(firewallRules));
+
+      return ok();
+
+    }
+    function updateRule(){
+      if(!isAuthenticated()) return unauthorized();
+
+      let params = body;
+      let rule = firewallRules.find(x => x.rule_num === idFromUrl());
+
+      Object.assign(rule, params);
+      localStorage.setItem(lanFirewallKey, JSON.stringify(firewallRules));
+
+      return ok(rule);
+    }
+    function createRule(){
+      if (!isAuthenticated()) return unauthorized();
+      const rule = body;
+      if (firewallRules.find(x => x.ip_address === rule.ip_address)){
+        return error(`IP ${rule.ip_address} is already added`);
+      }
+      firewallRules.push(rule);
+      localStorage.setItem(lanFirewallKey, JSON.stringify(firewallRules));
       return ok();
     }
     function getRefreshToken(): string {
