@@ -15,7 +15,7 @@ export class AccountsListComponent implements OnInit {
   ngOnInit() {
     this.accountService.getAll()
         .pipe(first())
-        .subscribe(accounts=> this.accounts = accounts)
+        .subscribe(accounts => this.accounts = accounts)
   }
 
   deleteAccount(id: string){

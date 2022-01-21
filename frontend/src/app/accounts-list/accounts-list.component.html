@@ -3,9 +3,6 @@
   <a mat-flat-button routerLink="add" color="primary">Create Account</a>
 
   <table mat-table [dataSource]="accounts" class="mat-elevation-z8">
-      <!--- Note that these columns can be defined in any order.
-              The actual rendered columns are set as a property on the row definition" -->
-
       <!-- Last Name Column -->
       <ng-container matColumnDef="lastName">
           <th mat-header-cell *matHeaderCellDef>LastName</th>
@@ -34,7 +31,7 @@
       <ng-container matColumnDef="action">
           <th mat-header-cell *matHeaderCellDef>Action</th>
           <td mat-cell *matCellDef="let account" class="action-link">
-              <a mat-flat-button routerLink="edit/{{account.id}}">Edit</a> |
+              <a mat-flat-button routerLink="edit/{{account.id}}">Edit</a>
               <button mat-flat-button (click)="deleteAccount(account.id)" [disabled]="account.isDeleting">
                   <span *ngIf="account.isDeleting"></span>
                   <span *ngIf="!account.isDeleting">Delete</span>

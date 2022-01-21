@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NewRuleComponent } from './new-rule.component';
+import { FirewallAddEditComponent } from './firewall-add-edit.component';
 
-describe('NewRuleComponent', () => {
-  let component: NewRuleComponent;
-  let fixture: ComponentFixture<NewRuleComponent>;
+describe('FirewallAddEditComponent', () => {
+  let component: FirewallAddEditComponent;
+  let fixture: ComponentFixture<FirewallAddEditComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NewRuleComponent ]
+      declarations: [ FirewallAddEditComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NewRuleComponent);
+    fixture = TestBed.createComponent(FirewallAddEditComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

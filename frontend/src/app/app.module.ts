@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -12,6 +12,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatOptionModule } from '@angular/material/core';
+import { MatDividerModule} from '@angular/material/divider';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { AppRoutingModule } from './app-routing.module';
@@ -21,7 +22,6 @@ import { HomeComponent } from './home/home.component';
 import { VlanComponent } from './vlan/vlan.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FirewallComponent } from './firewall/firewall.component';
-import { NewRuleComponent } from './new-rule/new-rule.component';
 import { NewBindComponent } from './new-bind/new-bind.component';
 import { LoginComponent } from './login/login.component';
 import { AlertComponent } from './alert/alert.component';
@@ -31,6 +31,9 @@ import { AdminComponent } from './admin/admin.component';
 import { AccountsListComponent } from './accounts-list/accounts-list.component';
 import { JwtInterceptor } from './helpers/jwt.interceptor';
 import { AccountsAddEditComponent } from './accounts-add-edit/accounts-add-edit.component';
+import { AccountService } from './service/account.service';
+import { appInitializer } from './helpers/app.initializer';
+import { FirewallAddEditComponent } from './firewall-add-edit/firewall-add-edit.component';
 
 @NgModule({
   declarations: [
@@ -38,13 +41,13 @@ import { AccountsAddEditComponent } from './accounts-add-edit/accounts-add-edit.
     HomeComponent,
     VlanComponent,
     FirewallComponent,
-    NewRuleComponent,
     NewBindComponent,
     LoginComponent,
     AlertComponent,
     AdminComponent,
     AccountsListComponent,
-    AccountsAddEditComponent
+    AccountsAddEditComponent,
+    FirewallAddEditComponent
   ],
   imports: [
     BrowserModule,
@@ -63,9 +66,12 @@ import { AccountsAddEditComponent } from './accounts-add-edit/accounts-add-edit.
     MatFormFieldModule,
     MatInputModule,
     ReactiveFormsModule,
-    MatSelectModule
+    MatSelectModule,
+    MatDividerModule
   ],
-  providers: [LanService,
+  providers: [
+    { provide: LanService, useClass: LanService},
+    { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService]},
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     fakeBackendProvider

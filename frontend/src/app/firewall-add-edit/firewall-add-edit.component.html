@@ -1,0 +1,55 @@
+<mat-card>
+  <mat-card-title *ngIf="isAddMode">Create new Rule</mat-card-title>
+  <mat-card-title *ngIf="!isAddMode">Edit Rule</mat-card-title>
+  <mat-card-content>
+    <form [formGroup]="addEditForm" (ngSubmit)="submit()">
+      <p>
+        <mat-form-field>
+          <input type="text" matInput formControlName="rule_num" placeholder="Rule Number" name="rule_num" required>
+          <mat-error *ngIf="f.rule_num.touched && f.rule_num.invalid">
+            <span *ngIf="f.rule_num.errors?.required">This field is mandatory.</span>
+            <span *ngIf="f.rule_num.errors?.pattern">This field is invalid.</span>
+          </mat-error>
+        </mat-form-field>
+      </p>
+      <p>
+        <mat-form-field>
+          <input type="text" matInput formControlName="ip_address" placeholder="IP" name="ip" required>
+          <mat-error *ngIf="f.ip_address.touched && f.ip_address.invalid">
+            <span *ngIf="f.ip_address.errors?.required">This field is mandatory.</span>
+            <span *ngIf="f.ip_address.errors?.pattern">This field is invalid.</span>
+          </mat-error>
+        </mat-form-field>
+      </p>
+      <p>
+        <button mat-flat-button type="submit" [disabled]="loading">
+          <span *ngIf="loading"></span>
+          Save
+        </button>
+        <a mat-flat-button routerLink="/firewall">Cancel</a>
+      </p>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+<!-- <div class="example-container">
+  <div class="form-container">
+    <h1>ADD NEW RULE</h1>
+    <form [formGroup]="addEditForm" (submit)="submit()">
+      <mat-form-field class="form-field" appearance="outline">
+        <mat-label> Rule Num
+        </mat-label>
+        <input matInput formControlName="rule_num" required>
+
+      </mat-form-field>
+      <mat-form-field class="form-field" appearance="outline">
+        <mat-label> Ip Address
+        </mat-label>
+        <input matInput formControlName="ip_address" required>
+
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit">Add</button>
+    </form>
+  </div>
+</div> -->
