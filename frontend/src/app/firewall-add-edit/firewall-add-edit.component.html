@@ -23,8 +23,7 @@
       </p>
       <p>
         <button mat-flat-button type="submit" [disabled]="loading">
-          <span *ngIf="loading"></span>
-          Save
+          <span *ngIf="!loading">Save</span>
         </button>
         <a mat-flat-button routerLink="/firewall">Cancel</a>
       </p>

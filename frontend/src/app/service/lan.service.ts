@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse} from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { BASE_API_URL } from '../env';
-import { FireWallRule } from '../vlan/firewallrule';
-import { Bind } from '../new-bind/bind';
+import { catchError, finalize, map } from 'rxjs/operators';
+import { FireWallRule } from '../models/firewallrule';
 import { environment } from '../../environments/environment';
-import { MacIpBind } from '../vlan/vlan.component';
+import { MacIpBind } from '../models/bind';
+
 
 const baseUrl = `${environment.apiUrl}/lan`;
 @Injectable({
@@ -20,13 +19,6 @@ export class LanService {
 
   private static _handleError(err: HttpErrorResponse | any) {
     return Observable.throw(err.message || 'Error: Unable to complete request.');
-  }
-
-  // getVlan(vlanNum: string){
-  //   return this.http.get(`${baseUrl}/vlan/${vlanNum}`);
-  // }
-  getVlan(){
-    return this.http.get<MacIpBind[]>(`${baseUrl}/vlan`);
   }
 
   getFireWallRules() {
@@ -48,17 +40,28 @@ export class LanService {
   }
   deleteRule(ruleNum: string) {
     return this.http.delete(`${baseUrl}/firewall/${ruleNum}`)
-    .pipe(
+    .pipe(finalize(() => {
       catchError(LanService._handleError)
-    );
+    }));
   }
 
-  addNewBind(bind: Bind){
-    return this.http
-    .post(`${baseUrl}/lan/api/v1.0/vlan/add/`, bind)
-    .pipe(
-      catchError(LanService._handleError)
-    );
+  getVlanBinds(){
+    return this.http.get<MacIpBind[]>(`${baseUrl}/vlan`);
+  }
+
+  getVlanBindById(id: string) {
+    return this.http.get<MacIpBind>(`${baseUrl}/vlan/${id}`);
+  }
+
+  createBind(bind: object){
+    return this.http.post(`${baseUrl}/vlan`, bind);
+  }
+
+  updateBind(bindId: string, params: object){
+    return this.http.put(`${baseUrl}/vlan/${bindId}`, params)
+      .pipe(map((rule: any) => {
+        return rule;
+      }));
   }
 
   deleteBind(bindId: string) {

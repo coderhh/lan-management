@@ -1,3 +1,18 @@
+.example-container{
+  text-align: center
+}
+
+.form-container{
+  width: 400px;
+  margin: 0px auto;
+  margin-top: 200px
+}
+
+.form-field{
+  display: block
+}
+
+
 :host {
   display: flex;
   justify-content: center;
@@ -12,7 +27,6 @@
 mat-card-title,
 mat-card-content {
   display: flex;
-  font-size: 40px;
   justify-content: center;
 }
 

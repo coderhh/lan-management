@@ -3,19 +3,10 @@ import { Component, OnInit, AfterViewInit, ViewChild} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { Bind } from '../new-bind/bind';
 import { first } from 'rxjs/operators';
 import { AlertService } from '../service/alert.service';
-
-export interface MacIpBind {
-  id: string;
-  vlan: string;
-  ip: string;
-  mac: string;
-  mask: string;
-}
+import { MacIpBind } from '../models/bind';
 
 @Component({
   selector: 'app-vlan',
@@ -24,7 +15,7 @@ export interface MacIpBind {
 })
 export class VlanComponent implements OnInit, AfterViewInit {
 
-  displayedColumns: string[] = ['vlan', 'mac', 'ip', 'mask', 'action'];
+  displayedColumns: string[] = ['id','vlan', 'mac', 'ip', 'mask', 'action'];
 
   title = 'LAN';
   vlan: any;
@@ -80,7 +71,7 @@ export class VlanComponent implements OnInit, AfterViewInit {
   }
 
   private loadvlaninfo(num: string): void{
-    this.lanService.getVlan()
+    this.lanService.getVlanBinds()
         .pipe(first())
         .subscribe(res => {
           this.static_bind = res;

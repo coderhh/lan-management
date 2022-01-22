@@ -11,19 +11,16 @@ const baseUrl = `${environment.apiUrl}/accounts`;
   providedIn: 'root'
 })
 export class AccountService {
-
   constructor(private http: HttpClient, private router: Router) {
-    this.accountSubject = new BehaviorSubject<Account>(new Account());
+    this.accountSubject = new BehaviorSubject<any>(null);
     this.account = this.accountSubject.asObservable();
   }
 
   public get accountValue(): Account {
     return this.accountSubject.value;
   }
-  private accountSubject: BehaviorSubject<Account>;
+  private accountSubject: BehaviorSubject<any>;
   private account: Observable<Account>;
-
-  private refreshTokenTimeout: any;
 
   login(email: string, password: string) {
     return this.http.post<any>(`${baseUrl}/authenticate`, {email, password}, { withCredentials: true})
@@ -37,8 +34,8 @@ export class AccountService {
   logout(){
     this.http.post<any>(`${baseUrl}/revoke-token`, {}, { withCredentials: true}).subscribe();
     this.stopRefreshTokenTimer();
-    this.accountSubject.next(new Account());
-    this.router.navigate(['/login']);
+    this.accountSubject.next(null);
+    this.router.navigate(['/home']);
   }
 
   getAll(){
@@ -76,9 +73,7 @@ export class AccountService {
             this.logout();
         }));
   }
-  stopRefreshTokenTimer() {
-    clearTimeout(this.refreshTokenTimeout);
-  }
+
 
   refreshToken() {
     return this.http.post<any>(`${baseUrl}/refresh-token`, {}, { withCredentials: true})
@@ -87,6 +82,11 @@ export class AccountService {
           this.startRefreshTokenTimer();
           return account;
         }));
+  }
+
+  private refreshTokenTimeout: any;
+  stopRefreshTokenTimer() {
+    clearTimeout(this.refreshTokenTimeout);
   }
   private startRefreshTokenTimer() {
     // parse json object from base64 encoded jwt token
