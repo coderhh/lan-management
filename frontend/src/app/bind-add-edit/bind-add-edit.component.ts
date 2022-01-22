@@ -1,18 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Route, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { first } from 'rxjs/operators';
 import { AlertService } from '../service/alert.service';
 import { LanService } from '../service/lan.service';
 
-const rule_numRegx = '^[0-9]+$';
-const ip_addressRegx = '^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$';
+const IP_ADDRESSREGX= '^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$';
+const VLANREGX = '^[0-9]*$';
 @Component({
-  selector: 'app-firewall-add-edit',
-  templateUrl: './firewall-add-edit.component.html',
-  styleUrls: ['./firewall-add-edit.component.scss']
+  selector: 'app-bind-add-edit',
+  templateUrl: './bind-add-edit.component.html',
+  styleUrls: ['./bind-add-edit.component.scss']
 })
-export class FirewallAddEditComponent implements OnInit {
+export class BindAddEditComponent implements OnInit {
   addEditForm!: FormGroup;
   id!: string;
   isAddMode!: boolean;
@@ -24,52 +24,54 @@ export class FirewallAddEditComponent implements OnInit {
     private lanService: LanService,
     private alertService: AlertService,
     private router: Router,
-    private route: ActivatedRoute) {
-  }
+    private route: ActivatedRoute
+  ) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.id = this.route.snapshot.params['id'];
     this.isAddMode = !this.id;
-
     this.addEditForm = this.formBuilder.group({
-      rule_num: ['', [Validators.required, Validators.pattern(rule_numRegx)]],
-      ip_address: ['', [Validators.required, Validators.pattern(ip_addressRegx)]]
+      vlan: ['', [Validators.required, Validators.pattern(VLANREGX)]],
+      mac_address: ['', [Validators.required]],
+      ip_address: ['', [Validators.required, Validators.pattern(IP_ADDRESSREGX)]]
     });
 
-    if(!this.isAddMode){
-      this.lanService.getRuleById(this.id)
+    if(!this.isAddMode) {
+      this.lanService.getVlanBindById(this.id)
         .pipe(first())
-        .subscribe(rule => {
-          this.addEditForm.patchValue(rule);
-          this.loading = false;
+        .subscribe(bind => {
+          this.addEditForm.patchValue(bind)
         });
     }
   }
 
   get f() { return this.addEditForm.controls;}
 
-  submit() {
+  onSubmit(){
     this.submitted = true;
 
     this.alertService.clear();
-    if (this.addEditForm.invalid) {
+    if(this.addEditForm.invalid)
+    {
       return;
     }
+
     this.loading = true;
 
-    if(this.isAddMode){
-      this.createRule();
-    } else
+    if (this.isAddMode){
+      this.createBind();
+    }else
     {
-      this.updateRule();
+      this.updateBind();
     }
   }
-  createRule() {
-    this.lanService.createRule(this.addEditForm.value)
+
+  createBind() {
+    this.lanService.createBind(this.addEditForm.value)
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('Rule created successfully', { keepAfterRouteChange: true});
+          this.alertService.success('New Bind created successfully', { keepAfterRouteChange: true});
           this.router.navigate(['../'], { relativeTo: this.route});;
         },
         error: error => {
@@ -78,10 +80,8 @@ export class FirewallAddEditComponent implements OnInit {
         }
       });
   }
-
-  // method to update existing rule
-  updateRule() {
-    this.lanService.updateRule(this.id, this.addEditForm.value)
+  updateBind() {
+    this.lanService.updateBind(this.id, this.addEditForm.value)
       .pipe(first())
       .subscribe({
         next: () => {

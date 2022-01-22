@@ -32,10 +32,10 @@ export class AlertComponent implements OnInit, OnDestroy {
             // add alert to array
             this.alerts.push(alert);
 
-            // auto clear alert if required
-            // if (alert.autoClose){
-            //   setTimeout(() => this.removeAlert(alert), 5000);
-            // }
+            //auto clear alert if required
+            if (alert.autoClose){
+              setTimeout(() => this.removeAlert(alert), 5000);
+            }
           });
     this.routeSubscription = this.router.events.subscribe(event => {
       if (event instanceof NavigationStart){

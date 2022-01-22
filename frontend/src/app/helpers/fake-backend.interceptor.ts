@@ -22,11 +22,20 @@ if (accountsKeyStr !== null){
     id: 1,
     firstName:'yehang',
     lastName:'han',
-    Role:'Admin',
+    role:'Admin',
     email: 'yehanghan@gmail.com',
     password:'12345678',
     isVerified: true,
     refreshTokens: []});
+    accounts.push({
+      id: 2,
+      firstName:'test',
+      lastName:'test',
+      role:'User',
+      email: 'yehanghan2@gmail.com',
+      password:'12345678',
+      isVerified: true,
+      refreshTokens: []});
 }
 const lanFirewallKey = 'lan-firewall';
 const lanFirewallKeyStr = localStorage.getItem(lanFirewallKey);
@@ -38,6 +47,30 @@ else
 {
   for (let i = 0; i < 100; i++){
     firewallRules.push({rule_num: i, ip_address: '192.168.10.'+i});
+  }
+}
+
+const lanVlanBindingKey = 'lan-vlanbinding';
+const lanVlanBindingKeyStr = localStorage.getItem(lanVlanBindingKey);
+let vlanBindings: any[] = [];
+if (lanVlanBindingKeyStr !== null){
+  vlanBindings = JSON.parse(lanVlanBindingKeyStr);
+}
+else
+{
+  for (let i = 0; i < 100; i++){
+    if(i < 30)
+    {
+      vlanBindings.push({id: i, vlan: 10, mac_address: 'xxxx-xxxx-xxxx-xxxx', ip_address: '192.168.10.'+i, mask: '255.255.255.255' });
+    }
+    else if (i < 60)
+    {
+      vlanBindings.push({id: i, vlan: 11, mac_address: 'xxxx-xxxx-xxxx-xxxx', ip_address: '192.168.11.'+i, mask: '255.255.255.255' });
+    }
+    else
+    {
+      vlanBindings.push({id: i, vlan: 13, mac_address: 'xxxx-xxxx-xxxx-xxxx', ip_address: '192.168.13.'+i, mask: '255.255.255.255' });
+    }
   }
 }
 
@@ -82,6 +115,16 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             return deleteFirewallRule();
           case url.match(/\/firewall\/\d+$/) && method === 'PUT':
               return updateRule();
+          case url.endsWith('/vlan') && method === 'GET':
+              return getVlanBindings();
+          case url.match(/\/vlan\/\d+$/) && method === 'DELETE':
+              return deleteVlanBind();
+          case url.match(/\/vlan\/\d+$/) && method === 'GET':
+              return getVlanBindById();
+          case url.endsWith('/vlan') && method === 'POST':
+              return createBind();
+          case url.match(/\/vlan\/\d+$/) && method === 'PUT':
+              return updateBind();
           default:
               return next.handle(request);
       }
@@ -208,7 +251,6 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
       return ok();
     }
-
     function getFireWallRules(){
       if(!isAuthenticated()) return unauthorized();
       return ok(firewallRules);
@@ -225,9 +267,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       // delete firewall rule and save
       firewallRules = firewallRules.filter(rule => rule.rule_num !== idFromUrl());
       localStorage.setItem(lanFirewallKey,JSON.stringify(firewallRules));
-
       return ok();
-
     }
     function updateRule(){
       if(!isAuthenticated()) return unauthorized();
@@ -246,9 +286,53 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       if (firewallRules.find(x => x.ip_address === rule.ip_address)){
         return error(`IP ${rule.ip_address} is already added`);
       }
+      rule.rule_num = newRuleNum();
       firewallRules.push(rule);
       localStorage.setItem(lanFirewallKey, JSON.stringify(firewallRules));
       return ok();
+    }
+    function getVlanBindings(){
+      if(!isAuthenticated()) return unauthorized();
+      return ok(vlanBindings);
+    }
+
+    function getVlanBindById() {
+      if(!isAuthenticated()) return unauthorized();
+
+      let bind = vlanBindings.find(bind => bind.id === idFromUrl());
+      return ok(bind);
+    }
+    function deleteVlanBind(){
+      if(!isAuthenticated()) return unauthorized();
+
+      vlanBindings = vlanBindings.filter(x => x.id !== idFromUrl());
+      localStorage.setItem(lanVlanBindingKey,JSON.stringify(vlanBindings));
+
+      return ok();
+    }
+
+    function createBind(){
+      if (!isAuthenticated()) return unauthorized();
+      const bind = body;
+      if (vlanBindings.find(x => x.ip_address === bind.ip_address)){
+        return error(`IP ${bind.ip_address} is already added`);
+      }
+      bind.id = newBindId();
+      vlanBindings.push(bind);
+      localStorage.setItem(lanVlanBindingKey, JSON.stringify(vlanBindings));
+      return ok();
+    }
+
+    function updateBind(){
+      if(!isAuthenticated()) return unauthorized();
+
+      let params = body;
+      let bind = vlanBindings.find(x => x.id === idFromUrl());
+
+      Object.assign(bind, params);
+      localStorage.setItem(lanVlanBindingKey, JSON.stringify(vlanBindings));
+
+      return ok(bind);
     }
     function getRefreshToken(): string {
       // get refresh token from cookie
@@ -265,6 +349,12 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     }
     function newAccountId(): number {
       return accounts.length ? Math.max(...accounts.map(x => x.id)) + 1 : 1;
+    }
+    function newBindId(): number {
+      return vlanBindings.length ? Math.max(...vlanBindings.map(x => x.id)) + 1 : 1;
+    }
+    function newRuleNum(): number {
+      return firewallRules.length ? Math.max(...firewallRules.map(x => x.rule_num)) + 1 : 1;
     }
     function currentAccount(): any {
       // check if jwt token is in auth header
@@ -304,9 +394,9 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       return `fake-jwt-token.${btoa(JSON.stringify(tokenPayload))}`;
     }
 
-    function basicDetails(account: any): { id: any; title: any; firstName: any; lastName: any; email: any; role: any; dateCreated: any; isVerified: any; } {
-      const { id, title, firstName, lastName, email, role, dateCreated, isVerified } = account;
-      return { id, title, firstName, lastName, email, role, dateCreated, isVerified };
+    function basicDetails(account: any): { id: any; firstName: any; lastName: any; email: any; role: any; dateCreated: any; isVerified: any; } {
+      const { id, firstName, lastName, email, role, dateCreated, isVerified } = account;
+      return { id,firstName, lastName, email, role, dateCreated, isVerified };
     }
 
     function ok(body?: any) {

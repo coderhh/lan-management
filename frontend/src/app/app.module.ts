@@ -22,7 +22,6 @@ import { HomeComponent } from './home/home.component';
 import { VlanComponent } from './vlan/vlan.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FirewallComponent } from './firewall/firewall.component';
-import { NewBindComponent } from './new-bind/new-bind.component';
 import { LoginComponent } from './login/login.component';
 import { AlertComponent } from './alert/alert.component';
 import { fakeBackendProvider } from './helpers/fake-backend.interceptor';
@@ -34,6 +33,7 @@ import { AccountsAddEditComponent } from './accounts-add-edit/accounts-add-edit.
 import { AccountService } from './service/account.service';
 import { appInitializer } from './helpers/app.initializer';
 import { FirewallAddEditComponent } from './firewall-add-edit/firewall-add-edit.component';
+import { BindAddEditComponent } from './bind-add-edit/bind-add-edit.component';
 
 @NgModule({
   declarations: [
@@ -41,13 +41,13 @@ import { FirewallAddEditComponent } from './firewall-add-edit/firewall-add-edit.
     HomeComponent,
     VlanComponent,
     FirewallComponent,
-    NewBindComponent,
     LoginComponent,
     AlertComponent,
     AdminComponent,
     AccountsListComponent,
     AccountsAddEditComponent,
-    FirewallAddEditComponent
+    FirewallAddEditComponent,
+    BindAddEditComponent
   ],
   imports: [
     BrowserModule,
@@ -71,6 +71,7 @@ import { FirewallAddEditComponent } from './firewall-add-edit/firewall-add-edit.
   ],
   providers: [
     { provide: LanService, useClass: LanService},
+    { provide: AccountService, useClass: AccountService},
     { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService]},
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
