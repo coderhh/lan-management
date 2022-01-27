@@ -7,16 +7,18 @@ import jwt
 from typing import Union
 
 
-class User(db.Model):
-    """ User Model for storing user related details """
-    __tablename__ = "user"
+class Account(db.Model):
+    """ Account Model for storing account related details """
+    __tablename__ = "account"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    email = db.Column(db.String(255), unique=True, nullable=False)
-    registered_on = db.Column(db.DateTime, nullable=False)
-    admin = db.Column(db.Boolean, nullable=False, default=False)
     public_id = db.Column(db.String(100), unique=True)
-    username = db.Column(db.String(50), unique=True)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    first_name = db.Column(db.String(100))
+    last_name = db.Column(db.String(100))
+    role = db.Column(db.String(20), nullable=False)
+    created_on = db.Column(db.DateTime, nullable=False)
+    updated_on = db.Column(db.DateTime, nullable=True)
     password_hash = db.Column(db.String(100))
 
     @property
@@ -31,7 +33,7 @@ class User(db.Model):
         return flask_bcrypt.check_password_hash(self.password_hash, password)
 
     @staticmethod
-    def encode_auth_token(user_id: int) -> bytes:
+    def encode_auth_token(account_id: int) -> bytes:
         """
         Generates the Auth Token
         :return: string
@@ -40,7 +42,7 @@ class User(db.Model):
             payload = {
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1, seconds=5),
                 'iat': datetime.datetime.utcnow(),
-                'sub': user_id
+                'sub': account_id
             }
             return jwt.encode(
                 payload,
@@ -70,4 +72,4 @@ class User(db.Model):
             return 'Invalid token. Please log in again.'
 
     def __repr__(self):
-        return "<User '{}'>".format(self.username)
+        return "<Account '{}'>".format(self.email)

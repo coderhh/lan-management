@@ -1,7 +1,5 @@
 from functools import wraps
-
 from flask import request
-
 from app.main.service.auth_helper import Auth
 from typing import Callable
 
@@ -10,7 +8,7 @@ def token_required(f) -> Callable:
     @wraps(f)
     def decorated(*args, **kwargs):
 
-        data, status = Auth.get_logged_in_user(request)
+        data, status = Auth.get_logged_in_account(request)
         token = data.get('data')
 
         if not token:
@@ -25,14 +23,15 @@ def admin_token_required(f: Callable) -> Callable:
     @wraps(f)
     def decorated(*args, **kwargs):
 
-        data, status = Auth.get_logged_in_user(request)
+        data, status = Auth.get_logged_in_account(request)
         token = data.get('data')
 
         if not token:
             return data, status
 
-        admin = token.get('admin')
-        if not admin:
+        role = token.get('role')
+
+        if role != 'admin':
             response_object = {
                 'status': 'fail',
                 'message': 'admin token required'

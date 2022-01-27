@@ -1,17 +1,17 @@
-from app.main.model.user import User
-from ..service.blacklist_service import save_token
+from app.main.model.account import Account
+from .blacklist_service import save_token
 from typing import Dict, Tuple
 
 
 class Auth:
 
     @staticmethod
-    def login_user(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
+    def login_account(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
         try:
             # fetch the user data
-            user = User.query.filter_by(email=data.get('email')).first()
-            if user and user.check_password(data.get('password')):
-                auth_token = User.encode_auth_token(user.id)
+            account = Account.query.filter_by(email=data.get('email')).first()
+            if account and account.check_password(data.get('password')):
+                auth_token = Account.encode_auth_token(account.id)
                 if auth_token:
                     response_object = {
                         'status': 'success',
@@ -35,13 +35,13 @@ class Auth:
             return response_object, 500
 
     @staticmethod
-    def logout_user(data: str) -> Tuple[Dict[str, str], int]:
+    def logout_account(data: str) -> Tuple[Dict[str, str], int]:
         if data:
             auth_token = data.split(" ")[1]
         else:
             auth_token = ''
         if auth_token:
-            resp = User.decode_auth_token(auth_token)
+            resp = Account.decode_auth_token(auth_token)
             if not isinstance(resp, str):
                 # mark the token as blacklisted
                 return save_token(token=auth_token)
@@ -59,20 +59,20 @@ class Auth:
             return response_object, 403
 
     @staticmethod
-    def get_logged_in_user(new_request):
+    def get_logged_in_account(new_request):
         # get the auth token
         auth_token = new_request.headers.get('Authorization')
         if auth_token:
-            resp = User.decode_auth_token(auth_token)
+            resp = Account.decode_auth_token(auth_token)
             if not isinstance(resp, str):
-                user = User.query.filter_by(id=resp).first()
+                account = Account.query.filter_by(id=resp).first()
                 response_object = {
                     'status': 'success',
                     'data': {
-                        'user_id': user.id,
-                        'email': user.email,
-                        'admin': user.admin,
-                        'registered_on': str(user.registered_on)
+                        'account_id': account.id,
+                        'email': account.email,
+                        'role': account.role,
+                        'created_on': str(account.created_on)
                     }
                 }
                 return response_object, 200
