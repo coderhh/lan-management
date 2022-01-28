@@ -19,6 +19,7 @@ class AccountLogin(Resource):
     def post(self) -> Tuple[Dict[str, str], int]:
         # get the post data
         post_data = request.json
+        api.logger.info('User is trying to login')
         return Auth.login_account(data=post_data)
 
 
