@@ -1,11 +1,11 @@
-
 from .. import db, flask_bcrypt
 import datetime
 from app.main.model.blacklist import BlacklistToken
+from app.main.model.refresh_token import RefreshToken
 from ..config import key
 import jwt
 from typing import Union
-
+import secrets
 
 class Account(db.Model):
     """ Account Model for storing account related details """
@@ -20,6 +20,7 @@ class Account(db.Model):
     created_on = db.Column(db.DateTime, nullable=False)
     updated_on = db.Column(db.DateTime, nullable=True)
     password_hash = db.Column(db.String(100))
+    refresh_tokens = db.relationship('RefreshToken', backref='account', lazy=True)
 
     @property
     def password(self):
@@ -70,6 +71,20 @@ class Account(db.Model):
             return 'Signature expired. Please log in again.'
         except jwt.InvalidTokenError:
             return 'Invalid token. Please log in again.'
+
+    @staticmethod
+    def encode_refresh_token(ip: str):
+        refresh_token = RefreshToken(
+            token = secrets.token_hex(40),
+            expires = datetime.datetime.utcnow() + datetime.timedelta(days=7),
+            created_at = datetime.datetime.utcnow(),
+            created_by_ip = ip
+        )
+        return refresh_token
+    @staticmethod
+    def remove_old_refresh_token(self):
+        return ""
+
 
     def __repr__(self):
         return "<Account '{}'>".format(self.email)

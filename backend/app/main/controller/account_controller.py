@@ -22,7 +22,7 @@ class AccountList(Resource):
     @api.expect(_account, validate=True)
     @api.response(201, 'Account successfully created.')
     @api.doc('create a new account')
-    @admin_token_required
+    #@admin_token_required
     def post(self) -> Tuple[Dict[str, str], int]:
         """Creates a new Account """
         data = request.json

@@ -42,3 +42,12 @@ Make sure to run the initial migration commands to update the database.
     Downgrading PyJWT did the job for me.
     To achieve that, change the corresponding line in your requirements.txt to
     PyJWT==v1.7.1
+
+
+    Get IP address of visitors using Flask for Python
+    https://stackoverflow.com/questions/3759981/get-ip-address-of-visitors-using-flask-for-python
+    https://esd.io/blog/flask-apps-heroku-real-ip-spoofing.html
+
+
+    SQLAlchemy advanced features you need to start using
+    https://martinheinz.dev/blog/28

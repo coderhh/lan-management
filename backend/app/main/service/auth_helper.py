@@ -1,22 +1,36 @@
+import datetime
+from os import access
+import string
 from app.main.model.account import Account
+from app.main.util.dto import AuthDto
+from app.main.model.refresh_token import RefreshToken
+from app.main.util.dto import AccountDto
 from .blacklist_service import save_token
 from typing import Dict, Tuple
+from app.main import db
 
-
+api = AuthDto.api
 class Auth:
-
     @staticmethod
-    def login_account(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
+    def login_account(data: Dict[str, str], ip: string) -> Tuple[Dict[str, str], int]:
         try:
             # fetch the user data
             account = Account.query.filter_by(email=data.get('email')).first()
             if account and account.check_password(data.get('password')):
+                # generate Jwt token and refresh token
                 auth_token = Account.encode_auth_token(account.id)
+                refresh_token = Account.encode_refresh_token(ip)
+                account.refresh_tokens.append(refresh_token)
+
+                # remove old refresh token from account
+                Account.remove_old_refresh_token(account)
+                db.session.commit()
                 if auth_token:
                     response_object = {
                         'status': 'success',
                         'message': 'Successfully logged in.',
-                        'Authorization': auth_token.decode()
+                        'Authorization': auth_token.decode(),
+                        'RefreshToken': refresh_token.token
                     }
                     return response_object, 200
             else:
@@ -25,9 +39,8 @@ class Auth:
                     'message': 'email or password does not match.'
                 }
                 return response_object, 401
-
         except Exception as e:
-            print(e)
+            api.logger.error(e)
             response_object = {
                 'status': 'fail',
                 'message': 'Try again'
@@ -87,3 +100,67 @@ class Auth:
                 'message': 'Provide a valid auth token.'
             }
             return response_object, 401
+
+    @staticmethod
+    def ip_address(request)-> string:
+        if request.headers.getlist("X-Forwarded-For"):
+            ip = request.headers.getlist("X-Forwarded-For")[0]
+        else:
+            ip = request.remote_addr
+        return ip
+
+    @staticmethod
+    def refresh_token(token: str, ip: str) -> Tuple[Dict[str, str], int]:
+        try:
+            account = Account.query.join(RefreshToken).filter(RefreshToken.token == token).first()
+            if not account:
+                api.logger.warning('Invalid token')
+                response_object = {
+                    'status':'fail',
+                    'message':'invalid token'
+                }
+                return response_object, 401
+            new_refresh_token = Account.encode_refresh_token(ip)
+            token_iterator = filter(lambda refresh_token: refresh_token.token == token, account.refresh_tokens)
+            refresh_token = list(token_iterator)[0]
+            api.logger.info(refresh_token.token)
+            refresh_token.revoked = datetime.datetime.utcnow()
+            refresh_token.revoked_by_ip = ip
+            refresh_token.replaced_by_token = new_refresh_token.token
+            account.refresh_tokens.append(new_refresh_token)
+            db.session.commit()
+            # remove old refresh token
+            # active_token_iterator = filter(lambda refresh_token: refresh_token.is_active == True, account.refresh_tokens)
+            # account.refresh_tokens = list(active_token_iterator)
+            # db.session.commit()
+            jwt_auth_token = Account.encode_auth_token(account.id)
+            api.logger.info('NEW JWT TOKEN: {}'.format(jwt_auth_token))
+            response_object = {
+                'status': 'success',
+                'message': 'Successfully refreshed token.',
+                'Authorization': jwt_auth_token.decode(),
+                'RefreshToken': new_refresh_token.token
+            }
+            return response_object, 200
+        except Exception as e:
+            api.logger.error(e)
+            response_object = {
+                'status': 'fail',
+                'message':'try again'
+            }
+            return response_object, 500
+
+
+
+
+
+        response_object = {
+                        'status': 'success',
+                        'message': 'Successfully refresh token.',
+                        'Authorization': '',
+                        'RefreshToken': ''
+                    }
+        return response_object, 200
+
+
+

@@ -5,6 +5,8 @@ from app.main import db
 from app.main.model.account import Account
 from typing import Dict, Tuple
 
+from ..util.dto import AccountDto
+api = AccountDto.api
 
 def save_new_account(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
     account = Account.query.filter_by(email=data['email']).first()
@@ -28,17 +30,25 @@ def save_new_account(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
         return response_object, 409
 
 def update_an_account(data: Dict[str, str], public_id) -> Tuple[Dict[str, str], int]:
-    account = Account.query.filter(public_id=public_id)
+    account = get_a_account_by_id(public_id)
     if account:
-        new_account = Account(
-            email=data['email'],
-            first_name = data['first_name'],
-            last_name = data['last_name'],
-            role=data['role'],
-            password=data['password'],
-            updated_on=datetime.datetime.utcnow()
-        )
-        update_account(new_account)
+        # new_account = Account(
+        #     email=data['email'],
+        #     first_name = data['first_name'],
+        #     last_name = data['last_name'],
+        #     role=data['role'],
+        #     password=data['password'],
+        #     updated_on=datetime.datetime.utcnow()
+        # )
+
+        account.email=data['email']
+        account.first_name = data['first_name']
+        account.last_name = data['last_name']
+        account.role=data['role']
+        account.password=data['password']
+        account.updated_on=datetime.datetime.utcnow()
+
+        update_account(account)
         response_object = {
             'status': 'success',
             'message': 'Successfully updated.'
@@ -98,6 +108,5 @@ def delete_account(data: Account) -> None:
     db.session.delete(data)
     db.session.commit()
 def update_account(data:Account) -> None:
-    db.session.update(data)
     db.session.commit()
 
