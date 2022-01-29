@@ -5,7 +5,7 @@ from app.main.model.account import Account
 from app.main.util.dto import AuthDto
 from app.main.model.refresh_token import RefreshToken
 from app.main.util.dto import AccountDto
-from .blacklist_service import save_token
+from .blacklist_service import black_list_token, get_all_blacked_token
 from typing import Dict, Tuple
 from app.main import db
 
@@ -21,9 +21,8 @@ class Auth:
                 auth_token = Account.encode_auth_token(account.id)
                 refresh_token = Account.encode_refresh_token(ip)
                 account.refresh_tokens.append(refresh_token)
-
                 # remove old refresh token from account
-                Account.remove_old_refresh_token(account)
+                #Account.remove_old_refresh_token(account)
                 db.session.commit()
                 if auth_token:
                     response_object = {
@@ -48,16 +47,19 @@ class Auth:
             return response_object, 500
 
     @staticmethod
-    def logout_account(data: str) -> Tuple[Dict[str, str], int]:
+    def logout_account(data: str, refresh_token: str, ip: str) -> Tuple[Dict[str, str], int]:
         if data:
-            auth_token = data.split(" ")[1]
+            if " " in data:
+                auth_token = data.split(" ")[1]
+            else:
+                auth_token = data
         else:
             auth_token = ''
         if auth_token:
             resp = Account.decode_auth_token(auth_token)
             if not isinstance(resp, str):
                 # mark the token as blacklisted
-                return save_token(token=auth_token)
+                return black_list_token(token=auth_token, r_token = refresh_token, ip = ip)
             else:
                 response_object = {
                     'status': 'fail',
@@ -102,14 +104,6 @@ class Auth:
             return response_object, 401
 
     @staticmethod
-    def ip_address(request)-> string:
-        if request.headers.getlist("X-Forwarded-For"):
-            ip = request.headers.getlist("X-Forwarded-For")[0]
-        else:
-            ip = request.remote_addr
-        return ip
-
-    @staticmethod
     def refresh_token(token: str, ip: str) -> Tuple[Dict[str, str], int]:
         try:
             account = Account.query.join(RefreshToken).filter(RefreshToken.token == token).first()
@@ -124,15 +118,13 @@ class Auth:
             token_iterator = filter(lambda refresh_token: refresh_token.token == token, account.refresh_tokens)
             refresh_token = list(token_iterator)[0]
             api.logger.info(refresh_token.token)
-            refresh_token.revoked = datetime.datetime.utcnow()
+            refresh_token.revoked = datetime.datetime.now()
             refresh_token.revoked_by_ip = ip
             refresh_token.replaced_by_token = new_refresh_token.token
             account.refresh_tokens.append(new_refresh_token)
             db.session.commit()
-            # remove old refresh token
-            # active_token_iterator = filter(lambda refresh_token: refresh_token.is_active == True, account.refresh_tokens)
-            # account.refresh_tokens = list(active_token_iterator)
-            # db.session.commit()
+            #Account.remove_old_refresh_token(account)
+            #db.session.commit()
             jwt_auth_token = Account.encode_auth_token(account.id)
             api.logger.info('NEW JWT TOKEN: {}'.format(jwt_auth_token))
             response_object = {
@@ -149,18 +141,18 @@ class Auth:
                 'message':'try again'
             }
             return response_object, 500
+    @staticmethod
+    def get_all_blacked_token() -> Tuple[Dict[str, str], int]:
+        return get_all_blacked_token()
 
 
-
-
-
-        response_object = {
-                        'status': 'success',
-                        'message': 'Successfully refresh token.',
-                        'Authorization': '',
-                        'RefreshToken': ''
-                    }
-        return response_object, 200
+    @staticmethod
+    def ip_address(request)-> string:
+        if request.headers.getlist("X-Forwarded-For"):
+            ip = request.headers.getlist("X-Forwarded-For")[0]
+        else:
+            ip = request.remote_addr
+        return ip
 
 
 

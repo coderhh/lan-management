@@ -18,7 +18,7 @@ def save_new_account(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
             last_name = data['last_name'],
             role=data['role'],
             password=data['password'],
-            created_on=datetime.datetime.utcnow()
+            created_on=datetime.datetime.now()
         )
         save_changes(new_account)
         return generate_token(new_account)
@@ -32,21 +32,12 @@ def save_new_account(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
 def update_an_account(data: Dict[str, str], public_id) -> Tuple[Dict[str, str], int]:
     account = get_a_account_by_id(public_id)
     if account:
-        # new_account = Account(
-        #     email=data['email'],
-        #     first_name = data['first_name'],
-        #     last_name = data['last_name'],
-        #     role=data['role'],
-        #     password=data['password'],
-        #     updated_on=datetime.datetime.utcnow()
-        # )
-
         account.email=data['email']
         account.first_name = data['first_name']
         account.last_name = data['last_name']
         account.role=data['role']
         account.password=data['password']
-        account.updated_on=datetime.datetime.utcnow()
+        account.updated_on=datetime.datetime.now()
 
         update_account(account)
         response_object = {

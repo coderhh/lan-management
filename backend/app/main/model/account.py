@@ -1,3 +1,5 @@
+from enum import Flag
+from os import access
 from .. import db, flask_bcrypt
 import datetime
 from app.main.model.blacklist import BlacklistToken
@@ -41,8 +43,8 @@ class Account(db.Model):
         """
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1, seconds=5),
-                'iat': datetime.datetime.utcnow(),
+                'exp': datetime.datetime.now() + datetime.timedelta(days=1, seconds=5),
+                'iat': datetime.datetime.now(),
                 'sub': account_id
             }
             return jwt.encode(
@@ -76,14 +78,20 @@ class Account(db.Model):
     def encode_refresh_token(ip: str):
         refresh_token = RefreshToken(
             token = secrets.token_hex(40),
-            expires = datetime.datetime.utcnow() + datetime.timedelta(days=7),
-            created_at = datetime.datetime.utcnow(),
+            expires = datetime.datetime.now() + datetime.timedelta(days=7),
+            created_at = datetime.datetime.now(),
             created_by_ip = ip
         )
         return refresh_token
     @staticmethod
-    def remove_old_refresh_token(self):
-        return ""
+    def remove_old_refresh_token(account: object):
+        try:
+            token_iterator = filter(lambda refresh_token: refresh_token.is_active == True and refresh_token.is_expired == False, account.refresh_tokens)
+            refresh_tokens = list(token_iterator)
+            account.refresh_tokens = refresh_tokens
+        except Exception as e:
+            return e
+
 
 
     def __repr__(self):

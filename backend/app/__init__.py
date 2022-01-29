@@ -41,7 +41,7 @@ api = Api(
     version='1.0',
     description='backend api for lan mangement system',
     authorizations=authorizations,
-    security='apikey'
+    security=['apikey', 'refresh_token']
 )
 
 ##api.add_namespace(user_ns, path='/user')

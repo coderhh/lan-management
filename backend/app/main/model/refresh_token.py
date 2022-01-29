@@ -14,18 +14,16 @@ class RefreshToken(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     token = db.Column(db.String(500), unique=True, nullable=False)
     expires = db.Column(db.DateTime, nullable=False)
-    #is_expired = db.Column(db.Boolean, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     created_by_ip = db.Column(db.String(50), nullable=False)
     replaced_by_token = db.Column(db.String(500), unique=True)
     revoked = db.Column(db.DateTime)
     revoked_by_ip = db.Column(db.String(50))
-    #is_active = db.Column(db.Boolean, nullable=False)
     account_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)
 
     @property
     def is_expired(self):
-        return self.expires <= datetime.datetime.utcnow()
+        return self.expires <= datetime.datetime.now()
 
     @property
     def is_active(self):

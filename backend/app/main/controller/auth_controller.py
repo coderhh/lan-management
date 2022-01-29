@@ -32,20 +32,26 @@ class LogoutAPI(Resource):
     """
     Logout Resource
     """
-    @api.doc('logout a account')
+    @api.doc('logout an account')
     def post(self) -> Tuple[Dict[str, str], int]:
         # get auth token
         auth_header = request.headers.get('Authorization')
-        return Auth.logout_account(data=auth_header)
+        refresh_token = request.headers.get('RefreshToken')
+        ip = Auth.ip_address(request)
+        api.logger.info('User is trying to log out from IP ADDRESS: {} with JWT TOKEN: {} and REFRESH TOKEN: {}'.format(ip, auth_header, refresh_token))
+        return Auth.logout_account(data = auth_header, refresh_token = refresh_token, ip=ip)
 
 @api.route('/refresh-token')
-class RefresshToken(Resource):
+class RefreshToken(Resource):
     """
     Refresh Token Resource
     """
-    @api.doc('refresh the token')
+    @api.doc(security='refresh_token')
     def post(self) -> Tuple[Dict[str, str], int]:
         refresh_token = request.headers.get('RefreshToken')
         ip = Auth.ip_address(request)
         api.logger.info('User is trying to refresh token from IP ADDRESS: {} with {}'.format(ip, refresh_token))
         return Auth.refresh_token(refresh_token, ip)
+    # @api.doc('get all blacked token')
+    # def get(self) -> Tuple[Dict[str, str], int]:
+    #     return Auth.get_all_blacked_token()
