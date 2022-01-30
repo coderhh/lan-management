@@ -9,7 +9,7 @@ class RefreshToken(db.Model):
     Args:
         db ([type]): [description]
     """
-    __tablename__ = 'refresh_tokens'
+    __tablename__ = 'refresh_token'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     token = db.Column(db.String(500), unique=True, nullable=False)
