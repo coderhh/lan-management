@@ -4,6 +4,7 @@ import logging
 
 from .main.controller.account_controller import api as account_ns
 from .main.controller.auth_controller import api as auth_ns
+from .main.controller.firewall_rule_controller import api as firewall_rule_ns
 
 
 logging.basicConfig(level=logging.INFO,
@@ -44,6 +45,6 @@ api = Api(
     security=['apikey', 'refresh_token']
 )
 
-##api.add_namespace(user_ns, path='/user')
-api.add_namespace(account_ns, path='/account')
 api.add_namespace(auth_ns)
+api.add_namespace(account_ns, path='/account')
+api.add_namespace(firewall_rule_ns, path='/firewallrule')

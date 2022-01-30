@@ -51,3 +51,6 @@ Make sure to run the initial migration commands to update the database.
 
     SQLAlchemy advanced features you need to start using
     https://martinheinz.dev/blog/28
+
+
+    https://stackoverflow.com/questions/37133774/how-can-i-select-only-one-column-using-sqlalchemy/37134248

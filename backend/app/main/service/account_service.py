@@ -25,7 +25,7 @@ def save_new_account(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
     else:
         response_object = {
             'status': 'fail',
-            'message': 'User already exists. Please Log in.',
+            'message': 'Account already exists. Please Log in.',
         }
         return response_object, 409
 
