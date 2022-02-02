@@ -43,7 +43,6 @@ class Account(Resource):
         else:
             return account
     @api.doc('delete an account')
-    @api.marshal_with(_account)
     @admin_token_required
     def delete(self, public_id):
         """delete an account give its identifier"""

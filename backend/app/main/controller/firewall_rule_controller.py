@@ -14,7 +14,7 @@ _firewall_rule = FirewallRuleDto.firewall_rule
 @api.route('/')
 class FirewallRuleList(Resource):
     @api.doc('list_of_firewall_rules')
-    #@token_required
+    @token_required
     @api.marshal_list_with(_firewall_rule, envelope='data')
     def get(self):
         """List all firewall rules"""
@@ -23,7 +23,7 @@ class FirewallRuleList(Resource):
     @api.expect(_firewall_rule, validate=True)
     @api.response(201, 'Firewall rule successfully created.')
     @api.doc('create a new firewall rule')
-    #@oken_required
+    @token_required
     def post(self) -> Tuple[Dict[str, str], int]:
         """Creates a firewall rule """
         data = request.json
@@ -35,7 +35,7 @@ class FirewallRule(Resource):
     @api.response(404, 'Rule not found.')
     @api.doc('get a rule')
     @api.marshal_with(_firewall_rule)
-    #@oken_required
+    @token_required
     def get(self, rule_num):
         """get a rule given its identifier"""
         api.logger.info(rule_num)
@@ -45,8 +45,7 @@ class FirewallRule(Resource):
         else:
             return rule
     @api.doc('delete a rule')
-    @api.marshal_with(_firewall_rule)
-    #@token_required
+    @token_required
     def delete(self, rule_num):
         """delete a rule give its identifier"""
         return delete_a_rule(rule_num)

@@ -8,19 +8,26 @@ class AccountDto:
         'last_name': fields.String(required=True, description='account lastname'),
         'role': fields.String(required=True, description='account role'),
         'password': fields.String(required=True, description='account password'),
-        'public_id': fields.String(description='account Identifier')
+        'public_id': fields.String(description='account identifier')
+    })
+
+class AuthDto:
+    api = Namespace('Auth', description='authentication related operations')
+    account_auth = api.model('Auth_Details', {
+        'email': fields.String(required=True, description='The email address'),
+        'password': fields.String(required=True, description='The user password '),
     })
 
 
-class VlanBindDto:
-    api = Namespace('VlanBind',description='vlan bind related operations')
-    account = api.model('VlanBind', {
-        # 'email': fields.String(required=True, description='account email address'),
-        # 'first_name': fields.String(required=True, description='account firstname'),
-        # 'last_name': fields.String(required=True, description='account lastname'),
-        # 'role': fields.String(required=True, description='account role'),
-        # 'password': fields.String(required=True, description='account password'),
-        # 'public_id': fields.String(description='account Identifier')
+class VlanBindingDto:
+    api = Namespace('VlanBinding',description='vlan binding related operations')
+    vlan_binding = api.model('VlanBinding', {
+        'id': fields.String(description='binding id'),
+        'ip_address': fields.String(required=True, description='ip address'),
+        'mac_address': fields.String(required=True, description='mac address'),
+        'network_mask': fields.String(required=True, description='network mask'),
+        'vlan_id': fields.String(required=False, description='vlan id'),
+        'created_on': fields.String(description='created time'),
     })
 
 class FirewallRuleDto:
@@ -32,9 +39,4 @@ class FirewallRuleDto:
         'created_on': fields.String(description='created time'),
     })
 
-class AuthDto:
-    api = Namespace('Auth', description='authentication related operations')
-    account_auth = api.model('Auth_Details', {
-        'email': fields.String(required=True, description='The email address'),
-        'password': fields.String(required=True, description='The user password '),
-    })
+

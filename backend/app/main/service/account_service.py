@@ -42,7 +42,8 @@ def update_an_account(data: Dict[str, str], public_id) -> Tuple[Dict[str, str], 
         update_account(account)
         response_object = {
             'status': 'success',
-            'message': 'Successfully updated.'
+            'message': 'Successfully updated.',
+            'account': str(account)
         }
         return response_object, 200
     else:

@@ -1,9 +1,7 @@
-from ipaddress import ip_address
 from .. import db
-import datetime
 
 
-class VlanBind(db.Model):
+class VlanBinding(db.Model):
     """
      Model for storing vlan binding
     """
@@ -16,21 +14,25 @@ class VlanBind(db.Model):
     vlan_id = db.Column(db.Integer, nullable=False)
     created_on = db.Column(db.DateTime, nullable=False)
     updated_on = db.Column(db.DateTime)
-    def __init__(self, ip, mac_address, mask, vlan_id):
-        self.ip_address = ip
-        self.mac_address = mac_address
-        self.network_mask = mask
-        self.vlan_id = vlan_id
-        self.created_on = datetime.datetime.now()
 
     def __repr__(self):
-        return '<binding: ip: {} mac: {}'.format(self.ip_address, self.mac_address)
+        return '<binding: ip: {} mac: {} created_on: {} updated_on: {}'.format(self.ip_address, self.mac_address, self.created_on, self.updated_on)
 
     @staticmethod
     def check_binding(ip: str, mac: str) -> bool:
         # check whether ip or mac was already binded
-        res = VlanBind.query.filter(VlanBind.ip_address == ip or VlanBind.mac_address == mac ).any()
+        res = VlanBinding.query.filter(VlanBinding.ip_address == ip or VlanBinding.mac_address == mac).first()
         if res:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def check_binding_id(ip: str, mac: str, id:str) -> bool:
+        # check whether ip or mac was already binded
+        res = VlanBinding.query.filter((VlanBinding.ip_address == ip or VlanBinding.mac_address == mac)).first()
+        resd = res.query.filter(str(VlanBinding.id) != id)
+        if resd:
             return True
         else:
             return False
