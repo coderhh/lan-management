@@ -1,7 +1,7 @@
 import getpass
 import telnetlib
 import os
-import uuid
+import logging
 
 L3SWICH_HOST = "172.16.10.253"
 L3SWICH_USER = "admin"
@@ -11,6 +11,7 @@ FIREWALL_HOST = "172.16.10.254"
 FIREWALL_USER = "admin"
 FIREWALL_PASSWORD = "admin"
 
+logger= logging.getLogger(__name__)
 def bind_mac_ip(mac, vlan, ip):
     """Bind mac with static ip address to access internal server on layer-3 switch"""
     tn = telnetlib.Telnet(L3SWICH_HOST)
@@ -72,7 +73,7 @@ def get_mac_ip_binding(vlan):
     while n < 254:
         tn.write(b"\n")
         n = n + 1
-  
+
     tn.write(b"exit\n")
     tn.write(b"exit\n")
     tn.write(b"exit\n")
@@ -132,7 +133,7 @@ def dns_parsor(line):
 def permit_ip(rule_num, ip):
     """Permits certain ip on firewall"""
     tn = telnetlib.Telnet(FIREWALL_HOST)
- 
+
     tn.read_until(b"login: ")
     tn.write(FIREWALL_USER.encode('ascii') + b"\n")
     if FIREWALL_PASSWORD:
@@ -169,10 +170,11 @@ def undo_permit_ip(rule_num):
 
     print(tn.read_all().decode('ascii'))
 
-def get_all_firewall_rule():
+def get_firewall_rules_from_lan():
 
+    logger.info('Connecting to firewall....')
     tn = telnetlib.Telnet(FIREWALL_HOST)
- 
+
     tn.read_until(b"login: ")
     tn.write(FIREWALL_USER.encode('ascii') + b"\n")
     if FIREWALL_PASSWORD:
@@ -186,14 +188,14 @@ def get_all_firewall_rule():
     while n < 254:
         tn.write(b"\n")
         n = n + 1
-  
+
     tn.write(b"exit\n")
     tn.write(b"exit\n")
     tn.write(b"exit\n")
 
     data = tn.read_all().decode('ascii')
     rules = []
-    
+
     for line in data.splitlines():
         line = line.strip()
         if line.startswith("rule"):
@@ -212,7 +214,7 @@ def permit_rule_parsor(line):
     rule = Rule()
     rule.rule_num = line_blocks[1]
     rule.ip_address = line_blocks[5]
-   
+
     return rule
 
 if __name__ == "__main__":

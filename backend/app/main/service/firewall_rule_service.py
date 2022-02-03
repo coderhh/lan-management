@@ -4,10 +4,18 @@ from typing import Dict, Tuple
 from app.main import db
 from app.main.model.firewall import FirewallRule
 from app.main.util.dto import FirewallRuleDto
+from app.main.service.h3c_service import get_firewall_rules_from_lan
 
 api = FirewallRuleDto.api
 def get_all_rules():
-    return FirewallRule.query.all()
+    #return FirewallRule.query.all()
+    rules = FirewallRule.query.all()
+    if rules:
+        return rules
+    else:
+        api.logger.info('No rules in local database, retriving from Firewall equipment.....')
+        rules = get_firewall_rules_from_lan()
+        return rules
 
 def create_new_rule(data: Dict[str,str]) -> Tuple[Dict[str, str], int]:
     if not FirewallRule.check_firewall_rule(data['ip_address']):

@@ -14,7 +14,7 @@ _firewall_rule = FirewallRuleDto.firewall_rule
 @api.route('/')
 class FirewallRuleList(Resource):
     @api.doc('list_of_firewall_rules')
-    @token_required
+    #@token_required
     @api.marshal_list_with(_firewall_rule, envelope='data')
     def get(self):
         """List all firewall rules"""
