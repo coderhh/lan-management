@@ -15,7 +15,7 @@ def get_all_rules():
         api.logger.info('No rules found in local database, retriving from firewall equipment.....')
         rules = get_firewall_rules_from_lan()
         if not isinstance(rules, str):
-            api.logger.info('Writing rules data into database')
+            api.logger.info('Writing rules data into database...')
             return  bulk_create_new_rules(rules)
         else:
             response_object = {
@@ -76,7 +76,7 @@ def get_a_rule_by_rule_num(rule_num):
 def delete_a_rule(rule_num):
     rule = get_a_rule_by_rule_num(rule_num)
     if rule:
-        res = delete_rule_from_lan(str(rule.rule_num))
+        res = delete_rule_from_lan(rule_num)
         if not res:
             response_object = {
                 'status': 'fail',

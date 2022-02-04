@@ -4,10 +4,49 @@ import datetime
 from typing import Dict, Tuple
 from app.main.model.vlan import VlanBinding
 from app.main.util.dto import VlanBindingDto
+from app.main.service.h3c_service import get_bindings_from_lan,delete_binding_from_lan,create_new_binding_in_lan
 
 api = VlanBindingDto.api
 def get_all_bindings():
-    return VlanBinding.query.all()
+    bindings = VlanBinding.query.all()
+    if bindings:
+       return bindings
+    else:
+        api.logger.info('No binding found in local database, retriving from switch equipment.....')
+        static_bindings = get_bindings_from_lan()
+        if not isinstance(static_bindings, str):
+            api.logger.info('Writing bindings data into database...')
+            return bulk_create_new_bindings(static_bindings)
+        else:
+            response_object = {
+                "error": static_bindings
+            }
+            return response_object, 500
+
+def bulk_create_new_bindings(bindings):
+    try:
+        bindings_object = []
+        mac_address = []
+        for b in bindings:
+            new_binding = VlanBinding(
+                ip_address = b['ip_address'],
+                mac_address = b['mac_address'],
+                network_mask = b['mask'],
+                vlan_id = get_vlan_id(b['ip_address']),
+                created_on = datetime.datetime.now()
+            )
+            if new_binding.mac_address in mac_address:
+                api.logger.warning(new_binding)
+                filtered = filter(lambda score: score.mac_address == new_binding.mac_address, bindings_object)
+                api.logger.warning(list(filtered))
+            mac_address.append(new_binding.mac_address)
+            bindings_object.append(new_binding)
+        api.logger.info('Total bindings from L3 switch: {}'.format(len(bindings_object)))
+        db.session.bulk_save_objects(bindings_object)
+        db.session.commit()
+        return VlanBinding.query.all()
+    except Exception as e:
+        api.logger.error(e)
 
 def create_new_binding(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
     if not VlanBinding.check_binding(data['ip_address'], data['mac_address']):
@@ -18,6 +57,13 @@ def create_new_binding(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
             vlan_id = get_vlan_id(data['ip_address']),
             created_on = datetime.datetime.now()
         )
+        res = create_new_binding_in_lan(new_binding.mac_address,str(new_binding.vlan_id), new_binding.ip_address)
+        if not res:
+            response_object = {
+                'status': 'fail',
+                'message': 'failed to save new binding in lan..'
+            }
+            return response_object, 500
         save_changes(new_binding)
         response_object = {
             'status': 'success',
@@ -38,7 +84,15 @@ def get_a_binding_by_id(binding_id):
 def delete_a_binding(binding_id):
     binding = get_a_binding_by_id(binding_id)
     if binding:
-        delete_binding(binding)
+        res = delete_binding_from_lan(str(binding.vlan_id), binding.ip_address)
+        if not res:
+            response_object = {
+                'status': 'fail',
+                'message': 'can not delete from lan'
+            }
+            return response_object, 500
+
+        delete_binding_from_database(binding)
         response_object = {
             'status': 'success',
             'message': 'Successfully deleted.',
@@ -83,15 +137,16 @@ def update_a_binding(data: Dict[str, str], binding_id) -> Tuple[Dict[str, str], 
         return response_object, 500
 
 
-
 # helper method
 def get_vlan_id(ip: str):
     vlan_id = str(ip).split('.')[2]
     return vlan_id
 
 def save_changes(data: VlanBinding):
+    api.logger.info('creating binding in database...')
     db.session.add(data)
     db.session.commit()
-def delete_binding(data: VlanBinding):
+def delete_binding_from_database(data: VlanBinding):
+    api.logger.info('deleting binding from database...')
     db.session.delete(data)
     db.session.commit()

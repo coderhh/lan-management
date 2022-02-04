@@ -12,7 +12,7 @@ _vlan_binding = VlanBindingDto.vlan_binding
 @api.route('/')
 class VlanBindingList(Resource):
     @api.doc('list_of_vlan_binding')
-    @token_required
+    #@token_required
     @api.marshal_list_with(_vlan_binding, envelope='data')
     def get(self):
         """List all vlan bindings"""
@@ -21,7 +21,7 @@ class VlanBindingList(Resource):
     @api.expect(_vlan_binding, validate=True)
     @api.response(201, 'Binding successfully created.')
     @api.doc('Create a new vlan binding')
-    @token_required
+    #@token_required
     def post(self) -> Tuple[Dict[str, str], int]:
         """Creates a new Vlan Bind """
         data = request.json
@@ -33,6 +33,7 @@ class VlanBinding(Resource):
     @api.response(404, 'Vlan binding not found.')
     @api.doc('Get a vlan binding')
     @api.marshal_with(_vlan_binding)
+    #@token_required
     def get(self, binding_id):
         """Get a vlan binding given its identifier"""
         binding = get_a_binding_by_id(binding_id)
@@ -41,7 +42,7 @@ class VlanBinding(Resource):
         else:
             return binding
     @api.doc('Delete a vlan binding')
-    @token_required
+    #@token_required
     def delete(self, binding_id) -> Tuple[Dict[str, str], int]:
         """Delete a vlan binding give its identifier"""
         return delete_a_binding(binding_id)
