@@ -2,6 +2,7 @@ import getpass
 import telnetlib
 import os
 import logging
+import socket
 
 L3SWICH_HOST = "172.16.10.253"
 L3SWICH_USER = "admin"
@@ -130,92 +131,109 @@ def dns_parsor(line):
     dns = line_blocks[1:]
     return dns
 
-def permit_ip(rule_num, ip):
+def create_new_rule_in_lan(rule_num, ip):
     """Permits certain ip on firewall"""
-    tn = telnetlib.Telnet(FIREWALL_HOST)
+    try:
+        logger.info('creating rule {} in lan.'.format(rule_num))
+        if not check_connection(FIREWALL_HOST):
+            logger.info('Firewall is not reachable')
+            return False
+        tn = telnetlib.Telnet(FIREWALL_HOST)
+        tn.read_until(b"login: ")
+        tn.write(FIREWALL_USER.encode('ascii') + b"\n")
+        if FIREWALL_PASSWORD:
+            tn.read_until(b"Password: ")
+            tn.write(FIREWALL_PASSWORD.encode('ascii') + b"\n")
 
-    tn.read_until(b"login: ")
-    tn.write(FIREWALL_USER.encode('ascii') + b"\n")
-    if FIREWALL_PASSWORD:
-        tn.read_until(b"Password: ")
-        tn.write(FIREWALL_PASSWORD.encode('ascii') + b"\n")
+        permit_command = b"rule %s permit ip source %s 0\n" % (rule_num.encode('ascii'), ip.encode('ascii'))
+        logger.info(permit_command)
+        tn.write(b"sys\n")
+        tn.write(b"acl advanced 3002\n")
+        tn.write(permit_command)
+        tn.write(b"sa f\n")
+        tn.write(b"exit\n")
+        tn.write(b"exit\n")
+        tn.write(b"exit\n")
+        logger.info(tn.read_all().decode('ascii'))
+        return True
+    except Exception as e:
+        logger.error(e)
+        return False
 
-    permit_command = b"rule %s permit ip source %s 0\n" % (rule_num.encode('ascii'), ip.encode('ascii'))
-    tn.write(b"sys\n")
-    tn.write(b"acl advanced 3002\n")
-    tn.write(permit_command)
-    tn.write(b"sa f\n")
-    tn.write(b"exit\n")
-    tn.write(b"exit\n")
-    tn.write(b"exit\n")
-
-    print(tn.read_all().decode('ascii'))
-
-def undo_permit_ip(rule_num):
+def delete_rule_from_lan(rule_num):
     """Un-permit ip from firewall"""
-    tn = telnetlib.Telnet(FIREWALL_HOST)
-    tn.read_until(b"login: ")
-    tn.write(FIREWALL_USER.encode('ascii') + b"\n")
-    if FIREWALL_PASSWORD:
-        tn.read_until(b"Password: ")
-        tn.write(FIREWALL_PASSWORD.encode('ascii') + b"\n")
-    undo_command = b'undo rule %s\n' % (rule_num.encode('ascii'))
-    tn.write(b"sys\n")
-    tn.write(b"acl advanced 3002\n")
-    tn.write(undo_command)
-    tn.write(b"sa f\n")
-    tn.write(b"exit\n")
-    tn.write(b"exit\n")
-    tn.write(b"exit\n")
-
-    print(tn.read_all().decode('ascii'))
+    try:
+        logger.info('deleting rule {} from lan.'.format(rule_num))
+        if not check_connection(FIREWALL_HOST):
+             logger.info('Firewall is not reachable')
+             return False
+        tn = telnetlib.Telnet(FIREWALL_HOST)
+        tn.read_until(b"login: ")
+        tn.write(FIREWALL_USER.encode('ascii') + b"\n")
+        if FIREWALL_PASSWORD:
+            tn.read_until(b"Password: ")
+            tn.write(FIREWALL_PASSWORD.encode('ascii') + b"\n")
+        undo_command = b'undo rule %s\n' % (rule_num.encode('ascii'))
+        tn.write(b"sys\n")
+        tn.write(b"acl advanced 3002\n")
+        tn.write(undo_command)
+        tn.write(b"sa f\n")
+        tn.write(b"exit\n")
+        tn.write(b"exit\n")
+        tn.write(b"exit\n")
+        logger.info(tn.read_all().decode('ascii'))
+        return True
+    except Exception as e:
+        logger.error(e)
+        return False
 
 def get_firewall_rules_from_lan():
-
-    logger.info('Connecting to firewall....')
-    tn = telnetlib.Telnet(FIREWALL_HOST)
-
-    tn.read_until(b"login: ")
-    tn.write(FIREWALL_USER.encode('ascii') + b"\n")
-    if FIREWALL_PASSWORD:
-        tn.read_until(b"Password: ")
-        tn.write(FIREWALL_PASSWORD.encode('ascii') + b"\n")
-    dis_command = (b'dis th\n')
-    tn.write(b"sys\n")
-    tn.write(b"acl advanced 3002\n")
-    tn.write(dis_command)
-    n = 1
-    while n < 254:
-        tn.write(b"\n")
-        n = n + 1
-
-    tn.write(b"exit\n")
-    tn.write(b"exit\n")
-    tn.write(b"exit\n")
-
-    data = tn.read_all().decode('ascii')
     rules = []
+    try:
+        if not check_connection(FIREWALL_HOST):
+             logger.info('Firewall is not reachable')
+             return "Firewall is not reachable"
+        logger.info('Connecting to firewall....')
+        tn = telnetlib.Telnet(FIREWALL_HOST)
+        tn.read_until(b"login: ")
+        tn.write(FIREWALL_USER.encode('ascii') + b"\n")
+        if FIREWALL_PASSWORD:
+            tn.read_until(b"Password: ")
+            tn.write(FIREWALL_PASSWORD.encode('ascii') + b"\n")
+        dis_command = (b'dis th\n')
+        tn.write(b"sys\n")
+        tn.write(b"acl advanced 3002\n")
+        tn.write(dis_command)
+        n = 1
+        while n < 254:
+            tn.write(b"\n")
+            n = n + 1
 
-    for line in data.splitlines():
-        line = line.strip()
-        if line.startswith("rule"):
-            rules.append(permit_rule_parsor(line))
-        else:
-            pass
-    tn.close()
-    return rules
+        tn.write(b"exit\n")
+        tn.write(b"exit\n")
+        tn.write(b"exit\n")
 
-class Rule():
-    rule_num = ""
-    ip_address = ""
+        data = tn.read_all().decode('ascii')
+
+        for line in data.splitlines():
+            line = line.strip()
+            if line.startswith("rule"):
+                rules.append(permit_rule_parsor(line))
+            else:
+                pass
+        tn.close()
+        return rules
+    except Exception as e:
+        logger.error(type(e).__name__)
 
 def permit_rule_parsor(line):
     line_blocks = line.split(' ')
-    rule = Rule()
-    rule.rule_num = line_blocks[1]
-    rule.ip_address = line_blocks[5]
-
+    rule = { "rule_num": line_blocks[1], "ip_address": line_blocks[5]}
     return rule
+
+def check_connection(ip):
+    HOST_UP  = True if os.system("ping -c 1 " + ip) is 0 else False
+    return HOST_UP
 
 if __name__ == "__main__":
     print("test! test! test!")
