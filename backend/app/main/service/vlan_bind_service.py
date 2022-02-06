@@ -105,6 +105,22 @@ def delete_a_binding(binding_id):
         }
         return response_object, 404
 
+def delete_all_bindings():
+    try:
+        db.session.execute('''DELETE from {}'''. format(VlanBinding.__tablename__))
+        db.session.commit()
+        response_object = {
+            'status': 'success',
+            'message': 'Successfully deleted.',
+        }
+        return response_object, 200
+    except Exception as e:
+        api.logger.error(e)
+        response_object = {
+            'status': 'fail',
+            'message': 'can not delete from database'
+        }
+        return response_object, 500
 def update_a_binding(data: Dict[str, str], binding_id) -> Tuple[Dict[str, str], int]:
     binding = get_a_binding_by_id(binding_id)
     try:

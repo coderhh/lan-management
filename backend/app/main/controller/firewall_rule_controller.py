@@ -3,7 +3,7 @@ from flask_restx import Resource
 from app.main.util.decorator import admin_token_required, token_required
 from ..util.dto import FirewallRuleDto
 from ..service.account_service import  update_an_account
-from ..service.firewall_rule_service import get_all_rules, create_new_rule, get_a_rule_by_rule_num, delete_a_rule
+from ..service.firewall_rule_service import get_all_rules, create_new_rule, get_a_rule_by_rule_num, delete_a_rule, delete_all_rules
 from typing import Dict, Tuple
 
 api = FirewallRuleDto.api
@@ -27,6 +27,13 @@ class FirewallRuleList(Resource):
         """Creates a firewall rule """
         data = request.json
         return create_new_rule(data=data)
+
+    @api.doc('delete all rules')
+    @admin_token_required
+    def delete(self):
+        """delete all rules from local databaser"""
+        return delete_all_rules()
+
 
 @api.route('/<rule_num>')
 @api.param('rule_num', 'The Rule identifier')
