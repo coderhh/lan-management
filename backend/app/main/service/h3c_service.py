@@ -1,18 +1,18 @@
-import getpass
 import telnetlib
 import os
 import logging
-import socket
+from ..config import LANConfig
 
-L3SWICH_HOST = "172.16.10.253"
-L3SWICH_USER = "admin"
-L3SWICH_PASSWORD = "admin"
+L3SWICH_HOST = LANConfig.L3SWICH_HOST
+L3SWICH_USER = LANConfig.L3SWICH_USER
+L3SWICH_PASSWORD = LANConfig.L3SWICH_PASSWORD
 
-FIREWALL_HOST = "172.16.10.254"
-FIREWALL_USER = "admin"
-FIREWALL_PASSWORD = "admin"
+FIREWALL_HOST = LANConfig.FIREWALL_HOST
+FIREWALL_USER = LANConfig.FIREWALL_USER
+FIREWALL_PASSWORD = LANConfig.FIREWALL_PASSWORD
 
 logger= logging.getLogger(__name__)
+
 def create_new_binding_in_lan(mac, vlan, ip):
     """Bind mac with static ip address to access internal server on layer-3 switch"""
     try:
@@ -85,7 +85,6 @@ def delete_binding_from_lan(vlan,ip):
         logger.error(e)
         return False
 
-
 def get_bindings_from_lan():
     try:
 
@@ -100,6 +99,7 @@ def get_bindings_from_lan():
     except Exception as e:
         logger.error(e)
         return "internal error"
+
 def get_vlan(vlan):
     """Get mac and ip address binding info from layer 3 switch"""
     try:
@@ -285,5 +285,3 @@ def check_connection(ip):
 
 if __name__ == "__main__":
     print("test! test! test!")
-    undo_bind_mac_ip("vlan11","192.168.11.8")
-    bind_mac_ip("6c2b-5956-90c5","11","192.168.11.8")
