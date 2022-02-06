@@ -43,6 +43,19 @@ def create_new_binding_in_lan(mac, vlan, ip):
         logger.error(e)
         return False
 
+def update_vlan_binding_in_lan(old_mac, old_vlan, old_ip, new_mac, new_vlan, new_ip):
+    try:
+        if delete_binding_from_lan(old_vlan, old_ip):
+            if create_new_binding_in_lan(new_mac, new_vlan, new_ip):
+                return True
+            else:
+                return False
+        else:
+            return False
+    except Exception as e:
+        logger.error(e)
+        return False
+
 def delete_binding_from_lan(vlan,ip):
     """Remove mac and ip address binding from layer 3 switch"""
     try:

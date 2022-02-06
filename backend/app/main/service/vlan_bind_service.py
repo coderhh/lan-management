@@ -4,7 +4,7 @@ import datetime
 from typing import Dict, Tuple
 from app.main.model.vlan import VlanBinding
 from app.main.util.dto import VlanBindingDto
-from app.main.service.h3c_service import get_bindings_from_lan,delete_binding_from_lan,create_new_binding_in_lan
+from app.main.service.h3c_service import get_bindings_from_lan,delete_binding_from_lan,create_new_binding_in_lan,update_vlan_binding_in_lan
 
 api = VlanBindingDto.api
 def get_all_bindings():
@@ -109,10 +109,21 @@ def update_a_binding(data: Dict[str, str], binding_id) -> Tuple[Dict[str, str], 
     binding = get_a_binding_by_id(binding_id)
     try:
         if binding:
-            binding.ip_address = data['ip_address']
-            binding.mac_address = data['mac_address']
+            new_ip_address = data['ip_address']
+            new_mac_address = data['mac_address']
+            new_vlan_id = get_vlan_id(data['ip_address'])
+
+            res = update_vlan_binding_in_lan(binding.mac_address,str(binding.vlan_id), binding.ip_address, new_mac_address, new_vlan_id, new_ip_address)
+            if not res:
+                response_object = {
+                    'status': 'fail',
+                    'message': 'fail to update the bindings in lan',
+                }
+                return response_object, 500
+            binding.ip_address = new_ip_address
+            binding.mac_address = new_mac_address
             binding.network_mask = data['network_mask']
-            binding.vlan_id = get_vlan_id(data['ip_address'])
+            binding.vlan_id = new_vlan_id
             binding.updated_on = datetime.datetime.now()
             db.session.commit()
             response_object = {
@@ -143,9 +154,19 @@ def get_vlan_id(ip: str):
     return vlan_id
 
 def save_changes(data: VlanBinding):
-    api.logger.info('creating binding in database...')
-    db.session.add(data)
-    db.session.commit()
+    try:
+        api.logger.info('creating binding in database...')
+        db.session.add(data)
+        db.session.commit()
+    except IntegrityError as e:
+        api.logger.error(e)
+        db.session.rollback()
+        response_object = {
+            'status': 'fail',
+            'message': 'ip or mac was already bound, please check.',
+        }
+        return response_object, 500
+
 def delete_binding_from_database(data: VlanBinding):
     api.logger.info('deleting binding from database...')
     db.session.delete(data)
