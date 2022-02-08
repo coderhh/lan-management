@@ -1,6 +1,6 @@
 from ipaddress import ip_address
 import re
-from flask import request
+from flask import request, make_response
 from flask_restx import Resource
 
 from app.main.service.auth_helper import Auth
@@ -22,8 +22,11 @@ class AccountLogin(Resource):
         # get the post data
         post_data = request.json
         ip = Auth.ip_address(request)
-        api.logger.info('User is trying to login from IP ADDRESS: {}'.format(ip))
-        return Auth.login_account(data=post_data, ip=ip)
+        result =Auth.login_account(data=post_data, ip=ip)
+        res = make_response(result)
+        refresh_token = result[0]['refreshToken']
+        res.set_cookie("refreshToken", value = refresh_token , httponly = True)
+        return res
 
 
 
@@ -36,7 +39,7 @@ class LogoutAPI(Resource):
     def post(self) -> Tuple[Dict[str, str], int]:
         # get auth token
         auth_header = request.headers.get('Authorization')
-        refresh_token = request.headers.get('RefreshToken')
+        refresh_token = request.cookies.get('refreshToken')
         ip = Auth.ip_address(request)
         api.logger.info('User is trying to log out from IP ADDRESS: {} with JWT TOKEN: {} and REFRESH TOKEN: {}'.format(ip, auth_header, refresh_token))
         return Auth.logout_account(data = auth_header, refresh_token = refresh_token, ip=ip)
@@ -48,10 +51,13 @@ class RefreshToken(Resource):
     """
     @api.doc(security='refresh_token')
     def post(self) -> Tuple[Dict[str, str], int]:
-        refresh_token = request.headers.get('RefreshToken')
+        auth_header = request.headers.get('Authorization')
+        #refresh_token = request.headers.get('RefreshToken')
+        #api.logger.info(request.cookies)
+        refresh_token = request.cookies.get('refreshToken')
         ip = Auth.ip_address(request)
-        api.logger.info('User is trying to refresh token from IP ADDRESS: {} with {}'.format(ip, refresh_token))
-        return Auth.refresh_token(refresh_token, ip)
+        api.logger.info('User is trying to refresh token from IP ADDRESS: {} with refreshToken: {} and jwtToken: {}'.format(ip, refresh_token,auth_header))
+        return make_response(Auth.refresh_token(refresh_token, ip))
     # @api.doc('get all blacked token')
     # def get(self) -> Tuple[Dict[str, str], int]:
     #     return Auth.get_all_blacked_token()

@@ -1,3 +1,4 @@
+from importlib.resources import path
 from flask_restx import Api
 from flask import Blueprint
 import logging
@@ -30,7 +31,7 @@ authorizations = {
         'in': 'header',
         'name': 'Authorization'
     },
-     'refresh_token': {
+    'refresh_token': {
         'type': 'apiKey',
         'in': 'header',
         'name': 'RefreshToken'
@@ -46,7 +47,7 @@ api = Api(
     security=['apikey', 'refresh_token']
 )
 
-api.add_namespace(auth_ns)
+api.add_namespace(auth_ns, path='/auth')
 api.add_namespace(account_ns, path='/account')
 api.add_namespace(firewall_rule_ns, path='/firewallrule')
 api.add_namespace(vlan_bind_ns, path='/vlanbinding')

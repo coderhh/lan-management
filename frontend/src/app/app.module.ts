@@ -71,11 +71,10 @@ import { BindAddEditComponent } from './bind-add-edit/bind-add-edit.component';
   ],
   providers: [
     { provide: LanService, useClass: LanService},
-    { provide: AccountService, useClass: AccountService},
     { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService]},
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    fakeBackendProvider
+    //fakeBackendProvider
   ],
   bootstrap: [AppComponent]
 })

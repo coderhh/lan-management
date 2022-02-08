@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
 import { MacIpBind } from '../models/bind';
 
 
-const baseUrl = `${environment.apiUrl}/lan`;
+const baseUrl = `${environment.apiUrl}`;
 @Injectable({
   providedIn: 'root'
 })
@@ -22,49 +22,49 @@ export class LanService {
   }
 
   getFireWallRules() {
-     return this.http.get<FireWallRule[]>(`${baseUrl}/firewall`);
+     return this.http.get<FireWallRule[]>(`${baseUrl}/firewallrule/`);
   }
 
   getRuleById(id: string) {
-    return this.http.get<FireWallRule>(`${baseUrl}/firewall/${id}`);
+    return this.http.get<FireWallRule>(`${baseUrl}/firewallrule/${id}`);
   }
 
   createRule(rule: object) {
-    return this.http.post(`${baseUrl}/firewall`, rule);
+    return this.http.post(`${baseUrl}/firewallrule`, rule);
   }
   updateRule(ruleNum: string, params: object){
-    return this.http.put(`${baseUrl}/firewall/${ruleNum}`, params)
+    return this.http.put(`${baseUrl}/firewallrule/${ruleNum}`, params)
       .pipe(map((rule: any) => {
         return rule;
       }));
   }
   deleteRule(ruleNum: string) {
-    return this.http.delete(`${baseUrl}/firewall/${ruleNum}`)
+    return this.http.delete(`${baseUrl}/firewallrule/${ruleNum}`)
     .pipe(finalize(() => {
       catchError(LanService._handleError)
     }));
   }
 
   getVlanBinds(){
-    return this.http.get<MacIpBind[]>(`${baseUrl}/vlan`);
+    return this.http.get<MacIpBind[]>(`${baseUrl}/vlanbinding/`);
   }
 
   getVlanBindById(id: string) {
-    return this.http.get<MacIpBind>(`${baseUrl}/vlan/${id}`);
+    return this.http.get<MacIpBind>(`${baseUrl}/vlanbinding/${id}`);
   }
 
   createBind(bind: object){
-    return this.http.post(`${baseUrl}/vlan`, bind);
+    return this.http.post(`${baseUrl}/vlanbinding`, bind);
   }
 
   updateBind(bindId: string, params: object){
-    return this.http.put(`${baseUrl}/vlan/${bindId}`, params)
+    return this.http.put(`${baseUrl}/vlanbinding/${bindId}`, params)
       .pipe(map((rule: any) => {
         return rule;
       }));
   }
 
   deleteBind(bindId: string) {
-    return this.http.delete(`${baseUrl}/vlan/${bindId}`);
+    return this.http.delete(`${baseUrl}/vlanbinding/${bindId}`);
   }
 }

@@ -14,7 +14,7 @@ _account = AccountDto.account
 class AccountList(Resource):
     @api.doc('list_of_registered_account')
     @admin_token_required
-    @api.marshal_list_with(_account, envelope='data')
+    @api.marshal_list_with(_account)
     def get(self):
         """List all registered accounts"""
         return get_all_accounts()
