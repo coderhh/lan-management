@@ -21,7 +21,7 @@ manager.add_command('db', MigrateCommand)
 
 @manager.command
 def run():
-    app.run()
+    app.run(ssl_context=('conf/cert.pem', 'conf/key.pem'))
 
 
 @manager.command
