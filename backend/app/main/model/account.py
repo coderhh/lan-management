@@ -22,7 +22,7 @@ class Account(db.Model):
     created_on = db.Column(db.DateTime, nullable=False)
     updated_on = db.Column(db.DateTime, nullable=True)
     password_hash = db.Column(db.String(100))
-    refresh_tokens = db.relationship('RefreshToken', backref='account', lazy=True)
+    refresh_tokens = db.relationship('RefreshToken', cascade="all, delete")
 
     @property
     def password(self):
@@ -93,7 +93,13 @@ class Account(db.Model):
             account.refresh_tokens = refresh_tokens
         except Exception as e:
             return e
-
+    @staticmethod
+    def asdict(self):
+        return {'public_id': self.public_id,
+                'email': self.email,
+                'first_name': self.first_name,
+                'last_name': self.last_name,
+                'role': self.role}
 
 
     def __repr__(self):

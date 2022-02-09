@@ -3,7 +3,7 @@
   <mat-card-content *ngIf="isLoggedIn">
     <a mat-flat-button routerLink="/firewall"> FIREWALL </a>
     <a mat-button routerLink="/vlan"> VLAN </a>
-    <a mat-button routerLink="/admin"> ADMIN </a>
+    <a *ngIf = "isAdmin" mat-button routerLink="/admin"> ADMIN </a>
     <button mat-button (click)="logout()">LOGOUT</button>
   </mat-card-content>
   <mat-card-content *ngIf="!isLoggedIn">

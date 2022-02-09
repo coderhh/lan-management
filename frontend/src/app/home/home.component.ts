@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Account } from '../models/account';
+import { Role } from '../models/role';
 import { AccountService } from '../service/account.service';
 
 @Component({
@@ -9,6 +10,7 @@ import { AccountService } from '../service/account.service';
 })
 export class HomeComponent implements OnInit {
   isLoggedIn: boolean = false;
+  isAdmin: boolean = false;
   account!: Account;
   constructor(private accountService: AccountService) {
     this.accountService.account.subscribe(x => this.account = x);
@@ -17,11 +19,13 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
       if(this.account){
         this.isLoggedIn = true;
+        if(this.account.role?.toLocaleUpperCase() == Role.Admin){
+          this.isAdmin = true;
+        }
       }
   }
 
   logout(){
     this.accountService.logout();
-    //window.location.reload();
   }
 }

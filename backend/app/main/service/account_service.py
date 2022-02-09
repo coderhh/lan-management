@@ -62,12 +62,19 @@ def get_a_account_by_id(public_id):
 def delete_a_account(public_id):
     account = get_a_account_by_id(public_id)
     if account:
-        delete_account(account)
-        response_object = {
-            'status': 'success',
-            'message': 'Successfully deleted.',
-        }
-        return response_object, 200
+        res = delete_account(account)
+        if res:
+            response_object = {
+                'status': 'success',
+                'message': 'Successfully deleted.',
+            }
+            return response_object, 200
+        else:
+            response_object = {
+                'status': 'fails',
+                'message': 'can not delete.',
+            }
+            return response_object, 500
     else:
         response_object = {
             'status': 'fail',
@@ -97,8 +104,13 @@ def save_changes(data: Account) -> None:
     db.session.add(data)
     db.session.commit()
 def delete_account(data: Account) -> None:
-    db.session.delete(data)
-    db.session.commit()
+    try:
+        db.session.delete(data)
+        db.session.commit()
+        return True
+    except Exception as e:
+        api.logger.error(e)
+        return False
 def update_account(data:Account) -> None:
     db.session.commit()
 

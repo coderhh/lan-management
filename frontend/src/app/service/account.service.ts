@@ -6,7 +6,7 @@ import { Account } from '../models/account';
 import { environment } from '../../environments/environment';
 import { finalize, map } from 'rxjs/operators';
 
-const baseUrl = `${environment.apiUrl}/account/`;
+const baseUrl = `${environment.apiUrl}/account`;
 const authUrl = `${environment.apiUrl}/auth`;
 @Injectable({
   providedIn: 'root'
@@ -31,7 +31,6 @@ export class AccountService {
   login(email: string, password: string) {
     return this.http.post<any>(`${authUrl}/login`, {email, password}, { withCredentials: true})
           .pipe(map(account => {
-            //console.log(account);
             this.accountSubject.next(account);
             this.startRefreshTokenTimer();
             return account;
@@ -46,7 +45,7 @@ export class AccountService {
   }
 
   getAll(){
-    return this.http.get<Account[]>(baseUrl);
+    return this.http.get<Account[]>(`${baseUrl}/`);
   }
 
   getById(id: string)
@@ -56,7 +55,7 @@ export class AccountService {
 
   create(params: object)
   {
-    return this.http.post(baseUrl, params);
+    return this.http.post(`${baseUrl}/`, params);
   }
 
   update(id:string, params: object)

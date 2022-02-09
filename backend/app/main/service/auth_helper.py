@@ -32,6 +32,8 @@ class Auth:
                         'jwtToken': auth_token.decode(),
                         'refreshToken': refresh_token.token
                     }
+                    response_object.update(Account.asdict(account))
+                    api.logger.info(response_object)
                     return response_object, 200
             else:
                 response_object = {
@@ -133,6 +135,7 @@ class Auth:
                 'jwtToken': jwt_auth_token.decode(),
                 'refreshToken': new_refresh_token.token
             }
+            response_object.update(Account.asdict(account))
             return response_object, 200
         except Exception as e:
             api.logger.error(e)

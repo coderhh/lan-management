@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse} from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { FireWallRule } from '../models/firewallrule';
 import { environment } from '../../environments/environment';
 import { MacIpBind } from '../models/bind';
-
 
 const baseUrl = `${environment.apiUrl}`;
 @Injectable({
@@ -58,7 +57,6 @@ export class LanService {
   }
 
   updateBind(bindId: string, params: object){
-    console.log(bindId, params)
     return this.http.put(`${baseUrl}/vlanbinding/${bindId}`, params)
       .pipe(map((rule: any) => {
         return rule;
