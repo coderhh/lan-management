@@ -30,7 +30,7 @@ export class LanService {
   }
 
   createRule(rule: object) {
-    return this.http.post(`${baseUrl}/firewallrule`, rule);
+    return this.http.post(`${baseUrl}/firewallrule/`, rule);
   }
   updateRule(ruleNum: string, params: object){
     return this.http.put(`${baseUrl}/firewallrule/${ruleNum}`, params)
@@ -58,6 +58,7 @@ export class LanService {
   }
 
   updateBind(bindId: string, params: object){
+    console.log(bindId, params)
     return this.http.put(`${baseUrl}/vlanbinding/${bindId}`, params)
       .pipe(map((rule: any) => {
         return rule;

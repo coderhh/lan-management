@@ -31,9 +31,10 @@ export class BindAddEditComponent implements OnInit {
     this.id = this.route.snapshot.params['id'];
     this.isAddMode = !this.id;
     this.addEditForm = this.formBuilder.group({
-      vlan: ['', [Validators.required, Validators.pattern(VLANREGX)]],
+      vlan_id: ['', [Validators.required, Validators.pattern(VLANREGX)]],
       mac_address: ['', [Validators.required]],
-      ip_address: ['', [Validators.required, Validators.pattern(IP_ADDRESSREGX)]]
+      ip_address: ['', [Validators.required, Validators.pattern(IP_ADDRESSREGX)]],
+      network_mask: ['', [Validators.required, Validators.pattern(IP_ADDRESSREGX)]]
     });
 
     if(!this.isAddMode) {
