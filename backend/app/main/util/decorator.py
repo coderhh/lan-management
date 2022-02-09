@@ -32,7 +32,7 @@ def admin_token_required(f: Callable) -> Callable:
 
         role = token.get('role')
 
-        if role != 'admin':
+        if role.upper() != 'ADMIN':
             response_object = {
                 'status': 'fail',
                 'message': 'admin token required'

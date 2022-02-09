@@ -5,17 +5,17 @@
       <form [formGroup]="addEditForm" (ngSubmit)="onSubmit()">
           <p>
               <mat-form-field>
-                  <input type="text" matInput formControlName="firstName" placeholder="FirstName" name="firstName" required>
-                  <mat-error *ngIf="submitted && f.firstName.errors">
-                      <mat-error *ngIf="f.firstName.errors.required">FirstName is required</mat-error>
+                  <input type="text" matInput formControlName="first_name" placeholder="FirstName" name="first_name" required>
+                  <mat-error *ngIf="submitted && f.first_name.errors">
+                      <mat-error *ngIf="f.first_name.errors.required">FirstName is required</mat-error>
                   </mat-error>
               </mat-form-field>
           </p>
           <p>
               <mat-form-field>
-                  <input type="text" matInput placeholder="LastName" formControlName="lastName"/>
-                  <mat-error *ngIf="submitted && f.lastName.errors">
-                      <mat-error *ngIf="f.lastName.errors.required">Last Name is required</mat-error>
+                  <input type="text" matInput placeholder="LastName" formControlName="last_name" required>
+                  <mat-error *ngIf="submitted && f.last_name.errors">
+                      <mat-error *ngIf="f.last_name.errors.required">Last Name is required</mat-error>
                   </mat-error>
               </mat-form-field>
           </p>

@@ -19,7 +19,7 @@ class RefreshToken(db.Model):
     replaced_by_token = db.Column(db.String(500), unique=True)
     revoked = db.Column(db.DateTime)
     revoked_by_ip = db.Column(db.String(50))
-    account_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)
+    account_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=True)
 
     @property
     def is_expired(self):

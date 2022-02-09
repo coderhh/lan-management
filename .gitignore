@@ -109,3 +109,4 @@ flask-restplus-boilerplate/
 backend/app/__init__.py
 backend/app/main/lan_backend_main.db
 backend/migrations
+backend/app/main/lan_backend_main.db
