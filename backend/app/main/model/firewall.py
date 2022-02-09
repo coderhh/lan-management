@@ -1,6 +1,4 @@
-from enum import unique
 from .. import db
-import datetime
 
 class FirewallRule(db.Model):
     """

@@ -6,12 +6,19 @@ import { Account } from '../models/account';
 import { environment } from '../../environments/environment';
 import { finalize, map } from 'rxjs/operators';
 
-const baseUrl = `${environment.apiUrl}/accounts`;
+const baseUrl = `${environment.apiUrl}/account/`;
+const authUrl = `${environment.apiUrl}/auth`;
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
-  constructor(private http: HttpClient, private router: Router) {
+  private accountSubject: BehaviorSubject<any>;
+  public account: Observable<Account>;
+
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
     this.accountSubject = new BehaviorSubject<any>(null);
     this.account = this.accountSubject.asObservable();
   }
@@ -19,12 +26,12 @@ export class AccountService {
   public get accountValue(): Account {
     return this.accountSubject.value;
   }
-  private accountSubject: BehaviorSubject<any>;
-  private account: Observable<Account>;
+
 
   login(email: string, password: string) {
-    return this.http.post<any>(`${baseUrl}/authenticate`, {email, password}, { withCredentials: true})
+    return this.http.post<any>(`${authUrl}/login`, {email, password}, { withCredentials: true})
           .pipe(map(account => {
+            //console.log(account);
             this.accountSubject.next(account);
             this.startRefreshTokenTimer();
             return account;
@@ -32,7 +39,7 @@ export class AccountService {
   }
 
   logout(){
-    this.http.post<any>(`${baseUrl}/revoke-token`, {}, { withCredentials: true}).subscribe();
+    this.http.post<any>(`${authUrl}/logout`, {}, { withCredentials: true}).subscribe();
     this.stopRefreshTokenTimer();
     this.accountSubject.next(null);
     this.router.navigate(['/home']);
@@ -76,8 +83,9 @@ export class AccountService {
 
 
   refreshToken() {
-    return this.http.post<any>(`${baseUrl}/refresh-token`, {}, { withCredentials: true})
+    return this.http.post<any>(`${authUrl}/refresh-token`, {}, { withCredentials: true})
         .pipe(map((account) => {
+          //console.log(account)
           this.accountSubject.next(account);
           this.startRefreshTokenTimer();
           return account;

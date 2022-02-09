@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Account } from '../models/account';
 import { AccountService } from '../service/account.service';
 
 @Component({
@@ -8,11 +9,13 @@ import { AccountService } from '../service/account.service';
 })
 export class HomeComponent implements OnInit {
   isLoggedIn: boolean = false;
-  constructor(private accountService: AccountService) { }
+  account!: Account;
+  constructor(private accountService: AccountService) {
+    this.accountService.account.subscribe(x => this.account = x);
+  }
 
   ngOnInit(): void {
-      const account = this.accountService.accountValue;
-      if(account){
+      if(this.account){
         this.isLoggedIn = true;
       }
   }

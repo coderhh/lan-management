@@ -5,15 +5,6 @@
     <form [formGroup]="addEditForm" (ngSubmit)="submit()">
       <p>
         <mat-form-field>
-          <input type="text" matInput formControlName="rule_num" placeholder="Rule Number" name="rule_num" required>
-          <mat-error *ngIf="f.rule_num.touched && f.rule_num.invalid">
-            <span *ngIf="f.rule_num.errors?.required">This field is mandatory.</span>
-            <span *ngIf="f.rule_num.errors?.pattern">This field is invalid.</span>
-          </mat-error>
-        </mat-form-field>
-      </p>
-      <p>
-        <mat-form-field>
           <input type="text" matInput formControlName="ip_address" placeholder="IP" name="ip" required>
           <mat-error *ngIf="f.ip_address.touched && f.ip_address.invalid">
             <span *ngIf="f.ip_address.errors?.required">This field is mandatory.</span>

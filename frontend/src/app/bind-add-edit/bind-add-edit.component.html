@@ -5,9 +5,9 @@
     <form [formGroup] ="addEditForm" (ngSubmit)="onSubmit()">
       <p>
         <mat-form-field>
-          <input type="text" matInput formControlName="vlan" placeholder="Vlan Num" name="vlan_num" required>
-          <mat-error *ngIf="f.vlan.touched && f.vlan.invalid">
-            <span *ngIf="f.vlan.errors?.required">This field is mandatory.</span>
+          <input type="text" matInput formControlName="vlan_id" placeholder="Vlan Num" name="vlan_num" required>
+          <mat-error *ngIf="f.vlan_id.touched && f.vlan_id.invalid">
+            <span *ngIf="f.vlan_id.errors?.required">This field is mandatory.</span>
           </mat-error>
         </mat-form-field>
       </p>
@@ -25,6 +25,15 @@
           <mat-error *ngIf="f.ip_address.touched && f.ip_address.invalid">
             <span *ngIf="f.ip_address.errors?.required">This field is mandatory.</span>
             <span *ngIf="f.ip_address.errors?.pattern">This field is invalid.</span>
+          </mat-error>
+        </mat-form-field>
+      </p>
+      <p>
+        <mat-form-field>
+          <input type="text" matInput formControlName="network_mask" placeholder="MASK" name="network_mask" required>
+          <mat-error *ngIf="f.network_mask.touched && f.network_mask.invalid">
+            <span *ngIf="f.network_mask.errors?.required">This field is mandatory.</span>
+            <span *ngIf="f.network_mask.errors?.pattern">This field is invalid.</span>
           </mat-error>
         </mat-form-field>
       </p>

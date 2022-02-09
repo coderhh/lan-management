@@ -32,7 +32,6 @@ export class FirewallAddEditComponent implements OnInit {
     this.isAddMode = !this.id;
 
     this.addEditForm = this.formBuilder.group({
-      rule_num: ['', [Validators.required, Validators.pattern(rule_numRegx)]],
       ip_address: ['', [Validators.required, Validators.pattern(ip_addressRegx)]]
     });
 

@@ -3,7 +3,8 @@ import {
   HttpRequest,
   HttpHandler,
   HttpEvent,
-  HttpInterceptor
+  HttpInterceptor,
+  HttpHeaders
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AccountService } from '../service/account.service';
@@ -18,8 +19,13 @@ export class JwtInterceptor implements HttpInterceptor {
     const isLoggedIn = account && account.jwtToken;
     const isApiUrl = request.url.startsWith(environment.apiUrl);
     if (isLoggedIn && isApiUrl){
+      // const headers = new HttpHeaders({
+      //   'Authorization': `Bear ${account.jwtToken}`,
+      //   'RefreshToken': `${account.refreshToken}`
+      // });
+      // request = request.clone({headers});
       request = request.clone({
-        setHeaders: { Authorization: `Bear ${account.jwtToken}`}
+        setHeaders: { Authorization: `Bear ${account.jwtToken}` }
       });
     }
     return next.handle(request);

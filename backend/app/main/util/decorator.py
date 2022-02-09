@@ -1,9 +1,10 @@
 from functools import wraps
+import logging
 from flask import request
 from app.main.service.auth_helper import Auth
 from typing import Callable
 
-
+logger= logging.getLogger(__name__)
 def token_required(f) -> Callable:
     @wraps(f)
     def decorated(*args, **kwargs):

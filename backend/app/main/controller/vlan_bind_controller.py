@@ -1,7 +1,8 @@
+from app.main.service.vlan_bind_service import delete_all_bindings
 from flask import request
 from flask_restx import Resource
 
-from app.main.util.decorator import token_required
+from app.main.util.decorator import token_required, admin_token_required
 from app.main.service.vlan_bind_service import get_all_bindings, create_new_binding,get_a_binding_by_id,delete_a_binding, update_a_binding
 from ..util.dto import VlanBindingDto
 from typing import Dict, Tuple
@@ -13,7 +14,7 @@ _vlan_binding = VlanBindingDto.vlan_binding
 class VlanBindingList(Resource):
     @api.doc('list_of_vlan_binding')
     @token_required
-    @api.marshal_list_with(_vlan_binding, envelope='data')
+    @api.marshal_list_with(_vlan_binding)
     def get(self):
         """List all vlan bindings"""
         return get_all_bindings()
@@ -27,12 +28,19 @@ class VlanBindingList(Resource):
         data = request.json
         return create_new_binding(data=data)
 
+    @api.doc('Delete all vlan bindings')
+    @admin_token_required
+    def delete(self) -> Tuple[Dict[str, str], int]:
+        """Delete all vlan bindings"""
+        return delete_all_bindings()
+
 @api.route('/<binding_id>')
 @api.param('binding_id', 'The Vlan binding identifier')
 class VlanBinding(Resource):
     @api.response(404, 'Vlan binding not found.')
     @api.doc('Get a vlan binding')
     @api.marshal_with(_vlan_binding)
+    @token_required
     def get(self, binding_id):
         """Get a vlan binding given its identifier"""
         binding = get_a_binding_by_id(binding_id)

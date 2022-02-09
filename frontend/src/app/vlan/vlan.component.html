@@ -28,7 +28,7 @@
             <!-- Vlanname Column -->
             <ng-container matColumnDef="vlan">
               <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear> VLAN </th>
-              <td mat-cell *matCellDef="let bind"> {{bind.vlan}} </td>
+              <td mat-cell *matCellDef="let bind"> {{bind.vlan_id}} </td>
             </ng-container>
             <!-- Mac Column -->
             <ng-container matColumnDef="mac">
@@ -45,7 +45,7 @@
             <!-- Mask Column -->
             <ng-container matColumnDef="mask">
               <th mat-header-cell *matHeaderCellDef> MASK </th>
-              <td mat-cell *matCellDef="let bind"> {{bind.mask}} </td>
+              <td mat-cell *matCellDef="let bind"> {{bind.network_mask}} </td>
             </ng-container>
 
             <!-- Action Column -->

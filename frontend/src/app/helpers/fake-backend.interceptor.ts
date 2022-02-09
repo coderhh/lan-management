@@ -89,41 +89,41 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
     function handleRoute() {
       switch (true){
-          case url.endsWith('/authenticate') && method === 'POST':
+          case url.endsWith('/login') && method === 'POST':
             return authenticate();
           case url.endsWith('/refresh-token') && method === 'POST':
             return refreshToken();
-          case url.endsWith('/revoke-token') && method === 'POST':
+          case url.endsWith('/logout') && method === 'POST':
             return revokeToken();
-          case url.endsWith('/accounts') && method === 'GET':
+          case url.endsWith('/account/') && method === 'GET':
             return getAccounts();
-          case url.match(/\/accounts\/\d+$/) && method === 'GET':
+          case url.match(/\/account\/\d+$/) && method === 'GET':
             return getAccountById();
-          case url.endsWith('/accounts') && method === 'POST':
+          case url.endsWith('/account/') && method === 'POST':
             return createAccount();
-          case url.match(/\/accounts\/\d+$/) && method === 'PUT':
+          case url.match(/\/account\/\d+$/) && method === 'PUT':
             return updateAccount();
-          case url.match(/\/accounts\/\d+$/) && method === 'DELETE':
+          case url.match(/\/account\/\d+$/) && method === 'DELETE':
             return deleteAccount();
-          case url.endsWith('/firewall') && method === 'GET':
+          case url.endsWith('/firewallrule/') && method === 'GET':
             return getFireWallRules();
-          case url.endsWith('/firewall') && method === 'POST':
+          case url.endsWith('/firewallrule/') && method === 'POST':
             return createRule();
-          case url.match(/\/firewall\/\d+$/) && method === 'GET':
+          case url.match(/\/firewallrule\/\d+$/) && method === 'GET':
             return getFireWallRuleById();
-          case url.match(/\/firewall\/\d+$/) && method === 'DELETE':
+          case url.match(/\/firewallrule\/\d+$/) && method === 'DELETE':
             return deleteFirewallRule();
-          case url.match(/\/firewall\/\d+$/) && method === 'PUT':
+          case url.match(/\/firewallrule\/\d+$/) && method === 'PUT':
               return updateRule();
-          case url.endsWith('/vlan') && method === 'GET':
+          case url.endsWith('/vlanbinding/') && method === 'GET':
               return getVlanBindings();
-          case url.match(/\/vlan\/\d+$/) && method === 'DELETE':
+          case url.match(/\/vlanbinding\/\d+$/) && method === 'DELETE':
               return deleteVlanBind();
-          case url.match(/\/vlan\/\d+$/) && method === 'GET':
+          case url.match(/\/vlanbinding\/\d+$/) && method === 'GET':
               return getVlanBindById();
-          case url.endsWith('/vlan') && method === 'POST':
+          case url.endsWith('/vlanbinding/') && method === 'POST':
               return createBind();
-          case url.match(/\/vlan\/\d+$/) && method === 'PUT':
+          case url.match(/\/vlanbinding\/\d+$/) && method === 'PUT':
               return updateBind();
           default:
               return next.handle(request);
@@ -137,12 +137,14 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       if (!account) { return error('Email or Password is incorrect.'); }
 
       // add refresh token to account
-      account.refreshTokens.push(generateRefreshToken());
+      const refreshToken = getRefreshToken();
+      account.refreshTokens.push(refreshToken);
       localStorage.setItem(accountsKey, JSON.stringify(accounts));
 
       return ok({
           ...basicDetails(account),
-          jwtToken: generateJwtToken(account)
+          jwtToken: generateJwtToken(account),
+          refreshToken: refreshToken
       });
     }
 
@@ -157,12 +159,14 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
       // replace old refresh token with a new one and save
       account.refreshTokens = account.refreshTokens.filter((x: string) => x !== refreshToken);
-      account.refreshTokens.push(generateRefreshToken());
+      const newRefreshToken = generateRefreshToken();
+      account.refreshTokens.push(newRefreshToken);
       localStorage.setItem(accountsKey, JSON.stringify(accounts));
 
       return ok({
           ...basicDetails(account),
-          jwtToken: generateJwtToken(account)
+          jwtToken: generateJwtToken(account),
+          refreshToken: newRefreshToken
       });
     }
 

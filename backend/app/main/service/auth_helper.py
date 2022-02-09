@@ -14,6 +14,7 @@ class Auth:
     @staticmethod
     def login_account(data: Dict[str, str], ip: string) -> Tuple[Dict[str, str], int]:
         try:
+            api.logger.info('User {} is trying to login from IP ADDRESS: {}'.format(data.get('email'),ip))
             # fetch the user data
             account = Account.query.filter_by(email=data.get('email')).first()
             if account and account.check_password(data.get('password')):
@@ -28,8 +29,8 @@ class Auth:
                     response_object = {
                         'status': 'success',
                         'message': 'Successfully logged in.',
-                        'Authorization': auth_token.decode(),
-                        'RefreshToken': refresh_token.token
+                        'jwtToken': auth_token.decode(),
+                        'refreshToken': refresh_token.token
                     }
                     return response_object, 200
             else:
@@ -108,16 +109,15 @@ class Auth:
         try:
             account = Account.query.join(RefreshToken).filter(RefreshToken.token == token).first()
             if not account:
-                api.logger.warning('Invalid token')
+                api.logger.warning('invalid refresh token, can not find current account')
                 response_object = {
                     'status':'fail',
-                    'message':'invalid token'
+                    'message':'invalid refresh token, can not find current account'
                 }
                 return response_object, 401
             new_refresh_token = Account.encode_refresh_token(ip)
             token_iterator = filter(lambda refresh_token: refresh_token.token == token, account.refresh_tokens)
             refresh_token = list(token_iterator)[0]
-            api.logger.info(refresh_token.token)
             refresh_token.revoked = datetime.datetime.now()
             refresh_token.revoked_by_ip = ip
             refresh_token.replaced_by_token = new_refresh_token.token
@@ -130,8 +130,8 @@ class Auth:
             response_object = {
                 'status': 'success',
                 'message': 'Successfully refreshed token.',
-                'Authorization': jwt_auth_token.decode(),
-                'RefreshToken': new_refresh_token.token
+                'jwtToken': jwt_auth_token.decode(),
+                'refreshToken': new_refresh_token.token
             }
             return response_object, 200
         except Exception as e:

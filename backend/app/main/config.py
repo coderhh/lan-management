@@ -42,4 +42,12 @@ config_by_name = dict(
     prod=ProductionConfig
 )
 
+class LANConfig:
+    L3SWICH_HOST = "172.16.10.253"
+    L3SWICH_USER = "admin"
+    L3SWICH_PASSWORD = "admin"
+    FIREWALL_HOST = "172.16.10.254"
+    FIREWALL_USER = "admin"
+    FIREWALL_PASSWORD = "admin"
+
 key = Config.SECRET_KEY

@@ -1,7 +1,7 @@
 export interface MacIpBind {
   id: string;
-  vlan: string;
+  vlan_id: string;
   ip_address: string;
   mac_address: string;
-  mask: string;
+  network_mask: string;
 }
