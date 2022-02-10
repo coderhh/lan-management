@@ -53,7 +53,7 @@ export class LanService {
   }
 
   createBind(bind: object){
-    return this.http.post(`${baseUrl}/vlanbinding`, bind);
+    return this.http.post(`${baseUrl}/vlanbinding/`, bind);
   }
 
   updateBind(bindId: string, params: object){
