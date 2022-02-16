@@ -1,11 +1,13 @@
 import os
 import unittest
+from app.main.service.account_service import save_new_account
 
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 
 from app import blueprint
 from app.main import create_app, db
+from app.main.model.account import Account
 
 app = create_app(os.getenv('LAN_BACKEND_ENV') or 'dev')
 app.register_blueprint(blueprint)
@@ -18,7 +20,15 @@ migrate = Migrate(app, db)
 
 manager.add_command('db', MigrateCommand)
 
-
+@manager.command
+def seed():
+    data = {'email': 'yehanghan@gmail.com',
+            'first_name':'yehang',
+            'last_name':'han',
+            'role': 'admin',
+            'password':'012358'
+            }
+    save_new_account(data=data)
 @manager.command
 def run():
     app.run(ssl_context=('conf/cert.pem', 'conf/key.pem'))
