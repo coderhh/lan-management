@@ -22,17 +22,16 @@ manager.add_command('db', MigrateCommand)
 
 @manager.command
 def seed():
-    data = {'email': 'yehanghan@gmail.com',
-            'first_name':'yehang',
-            'last_name':'han',
+    data = {'email': 'lan-admin@leadmove.com',
+            'first_name':'admin',
+            'last_name':'super',
             'role': 'admin',
             'password':'012358'
             }
     save_new_account(data=data)
 @manager.command
 def run():
-    app.run(ssl_context=('conf/cert.pem', 'conf/key.pem'))
-
+    app.run(ssl_context=('conf/cert.pem', 'conf/key.pem'),host='0.0.0.0')
 
 @manager.command
 def test():

@@ -1,8 +1,8 @@
 """initial database migration
 
-Revision ID: 703e4db3caaa
-Revises:
-Create Date: 2022-02-16 13:23:50.237410
+Revision ID: 8c8926eff835
+Revises: 
+Create Date: 2022-02-16 14:40:53.940897
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '703e4db3caaa'
+revision = '8c8926eff835'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -77,7 +77,6 @@ def upgrade():
     sa.UniqueConstraint('replaced_by_token'),
     sa.UniqueConstraint('token')
     )
-
     # ### end Alembic commands ###
 
 
