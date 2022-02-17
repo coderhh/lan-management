@@ -12,10 +12,14 @@ def black_list_token(token: str, r_token: str, ip: str) -> Tuple[Dict[str, str],
     blacklist_token = BlacklistToken(token=token)
     try:
         refresh_token = RefreshToken.query.filter_by(token = r_token).first()
+
         if refresh_token:
-            # revole refresh token
-            refresh_token.revoked = datetime.datetime.now()
-            refresh_token.revoked_by_ip = ip
+            # revoke refresh token
+            #refresh_token.revoked = datetime.datetime.now()
+            #refresh_token.revoked_by_ip = ip
+            db.session.delete(refresh_token)
+            db.session.commit()
+            api.logger.info('BLACKED REFRESHTOKEN {}'.format(refresh_token))
         # insert the jwt token
         db.session.add(blacklist_token)
         db.session.commit()
