@@ -25,7 +25,7 @@ class AccountLogin(Resource):
         result =Auth.login_account(data=post_data, ip=ip)
         res = make_response(result)
         refresh_token = result[0]['refreshToken']
-        res.set_cookie("refreshToken", value = refresh_token , httponly = True)
+        res.set_cookie("refreshToken", value = refresh_token, samesite='None', secure=True, httponly = True)
         return res
 
 
