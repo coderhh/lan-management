@@ -23,7 +23,7 @@ jsonschema==4.4.0
 Mako==1.1.6
 MarkupSafe==2.0.1
 pycparser==2.21
-PyJWT==1.7.1
+PyJWT==2.4.0
 pyOpenSSL==22.0.0
 pyrsistent==0.18.1
 pytz==2021.3
