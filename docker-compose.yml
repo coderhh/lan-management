@@ -3,18 +3,18 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-    container_name: "frontend"
+      dockerfile: Dockerfile.dev
+    container_name: "lan-frontend"
     volumes:
-      - ./frontend/src:/app/src # for watching files
+      - ./frontend:/usr/src/app # for watching files
     ports:
-      - "4200:80"
+      - "4200:4200"
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
-    container_name: "backend"
+      dockerfile: Dockerfile.dev
+    container_name: "lan-backend"
     volumes:
         - ./backend:/app # for watching files
     ports:
-      - "5000:5000"
+      - "5001:5000"

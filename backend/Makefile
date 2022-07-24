@@ -15,6 +15,14 @@ tests:
 	. venv/bin/activate; \
 	python manage.py test
 
+db:
+	. venv/bin/activate; \
+	python manage.py db upgrade
+
+seed:
+	. venv/bin/activate; \
+	python manage.py seed
+
 run:
 	. venv/bin/activate; \
 	python manage.py run
