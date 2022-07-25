@@ -14,13 +14,25 @@ jobs:
         name: Check out code
 
       - uses: mr-smithers-excellent/docker-build-push@v5
-        name: Build & push Docker image
+        name: Build & push Docker backend image
         with:
           image: yehang/backend
           tags: v1, latest
           registry: docker.io
           directory: backend
           dockerfile: backend/Dockerfile.prod
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          
+      - uses: mr-smithers-excellent/docker-build-push@v5
+        name: Build & push Docker frontend image
+        with:
+          image: yehang/frontend
+          tags: v1, latest
+          addTimestamp: true
+          registry: docker.io
+          directory: frontend
+          dockerfile: frontend/Dockerfile.prod
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
