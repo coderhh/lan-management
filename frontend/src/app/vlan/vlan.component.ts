@@ -66,8 +66,16 @@ export class VlanComponent implements OnInit, AfterViewInit {
     );
   }
 
-  ngOnDestroy(): void {
-
+  deleteAllBindFromDB(): void {
+    this.lanService.deleteAllBindFromDB()
+    .subscribe(
+      response => {
+        //this.alertService.success('All Rules Deleted successful from DB');
+        window.location.reload();
+      }, (err) => {
+        this.alertService.error(err);
+      }
+    );
   }
 
   private loadvlaninfo(num: string): void{

@@ -44,6 +44,13 @@ export class LanService {
     }));
   }
 
+  deleteAllRulesFromDB() {
+    return this.http.delete(`${baseUrl}/firewallrule/`)
+    .pipe(finalize(() => {
+      catchError(LanService._handleError)
+    }));
+  }
+
   getVlanBinds(){
     return this.http.get<MacIpBind[]>(`${baseUrl}/vlanbinding/`);
   }
@@ -65,5 +72,12 @@ export class LanService {
 
   deleteBind(bindId: string) {
     return this.http.delete(`${baseUrl}/vlanbinding/${bindId}`);
+  }
+
+  deleteAllBindFromDB() {
+    return this.http.delete(`${baseUrl}/vlanbinding/`)
+    .pipe(finalize(() => {
+      catchError(LanService._handleError)
+    }));;
   }
 }

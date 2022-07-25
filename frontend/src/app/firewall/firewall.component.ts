@@ -52,6 +52,20 @@ export class FirewallComponent implements OnInit, AfterViewInit {
         });
   }
 
+  deleteAllRulesFromDB() {
+    this.lanService.deleteAllRulesFromDB()
+      .pipe(first())
+      .subscribe({
+          next: () => {
+            //this.alertService.success('Rules deleted successfully from local DB', { keepAfterRouteChange: true});
+            window.location.reload();
+          },
+          error: error => {
+            this.alertService.error(error);
+          }
+        });
+  }
+
   applyFilter(event: Event)
   {
     const filterValue = (event.target as HTMLInputElement).value;

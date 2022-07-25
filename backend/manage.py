@@ -31,7 +31,7 @@ def seed():
     save_new_account(data=data)
 @manager.command
 def run():
-    app.run(ssl_context=('conf/cert.pem', 'conf/key.pem'),host='0.0.0.0')
+    app.run('0.0.0.0')
 
 @manager.command
 def test():
