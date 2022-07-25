@@ -19,6 +19,7 @@ jobs:
           image: yehang/backend
           tags: v1, latest
           registry: docker.io
+          directory: backend
           dockerfile: backend/Dockerfile.prod
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
