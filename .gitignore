@@ -105,4 +105,5 @@ ENV/
 .DS_Store
 
 getting-started/
-backend/app/main/lan_backend_main.db
+*.db
+backend/app/main/*.db
