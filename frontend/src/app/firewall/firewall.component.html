@@ -41,4 +41,7 @@
         </table>
         <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </div>
+    <button mat-flat-button color="warn" (click)="deleteAllRulesFromDB()">
+      <span>Refresh</span>
+   </button>
 </div>
