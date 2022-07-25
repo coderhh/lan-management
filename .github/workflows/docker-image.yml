@@ -27,7 +27,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: "{{defaultContext}}:backend"
-          file: "{{defaultContext}}:/backend/Dockerfile.prod"
+          file: /backend/Dockerfile.prod
           push: true
           tags: user/app:latest
 
