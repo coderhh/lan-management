@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file backend/Dockerfile.prod --tag backend:$(date +%s)
+      run: docker build backend/ --file backend/Dockerfile.prod --tag backend:$(date +%s)
       
     - name: Docker Build & Push Action
       uses: mr-smithers-excellent/docker-build-push@v5.6
