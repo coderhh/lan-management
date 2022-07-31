@@ -189,7 +189,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     function getAccountById(){
       if (!isAuthenticated()) return unauthorized();
 
-      let account = accounts.find(x => x.id === idFromUrl());
+      const account = accounts.find(x => x.id === idFromUrl());
 
       if (account.id !== currentAccount().id && !isAuthorized(Role.Admin)) {
         return unauthorized();
@@ -220,8 +220,8 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     function updateAccount(){
       if(!isAuthenticated()) return unauthorized();
 
-      let params = body;
-      let account = accounts.find(x => x.id === idFromUrl());
+      const params = body;
+      const account = accounts.find(x => x.id === idFromUrl());
 
       if(account.id !== currentAccount().id && !isAuthorized(Role.Admin)) {
         return unauthorized();
@@ -242,7 +242,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     }
     function deleteAccount(){
       if(!isAuthenticated()) return unauthorized();
-      let account = accounts.find(x => x.id === idFromUrl());
+      const account = accounts.find(x => x.id === idFromUrl());
 
       if (account.id !== currentAccount().id && !isAuthorized(Role.Admin))
       {
@@ -262,7 +262,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     function getFireWallRuleById() {
       if(!isAuthenticated()) return unauthorized();
 
-      let rule = firewallRules.find(rule => rule.rule_num === idFromUrl());
+      const rule = firewallRules.find(rule => rule.rule_num === idFromUrl());
       return ok(rule);
     }
     function deleteFirewallRule(){
@@ -276,8 +276,8 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     function updateRule(){
       if(!isAuthenticated()) return unauthorized();
 
-      let params = body;
-      let rule = firewallRules.find(x => x.rule_num === idFromUrl());
+      const params = body;
+      const rule = firewallRules.find(x => x.rule_num === idFromUrl());
 
       Object.assign(rule, params);
       localStorage.setItem(lanFirewallKey, JSON.stringify(firewallRules));
@@ -303,7 +303,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     function getVlanBindById() {
       if(!isAuthenticated()) return unauthorized();
 
-      let bind = vlanBindings.find(bind => bind.id === idFromUrl());
+      const bind = vlanBindings.find(bind => bind.id === idFromUrl());
       return ok(bind);
     }
     function deleteVlanBind(){
@@ -330,8 +330,8 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     function updateBind(){
       if(!isAuthenticated()) return unauthorized();
 
-      let params = body;
-      let bind = vlanBindings.find(x => x.id === idFromUrl());
+      const params = body;
+      const bind = vlanBindings.find(x => x.id === idFromUrl());
 
       Object.assign(bind, params);
       localStorage.setItem(lanVlanBindingKey, JSON.stringify(vlanBindings));
@@ -422,7 +422,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
   }
 }
 
-export let fakeBackendProvider = {
+export const fakeBackendProvider = {
   provide: HTTP_INTERCEPTORS,
   useClass: FakeBackendInterceptor,
   multi: true

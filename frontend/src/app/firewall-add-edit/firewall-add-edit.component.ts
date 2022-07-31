@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Route, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { first } from 'rxjs/operators';
 import { AlertService } from '../service/alert.service';
 import { LanService } from '../service/lan.service';
 
-const rule_numRegx = '^[0-9]+$';
-const ip_addressRegx = '^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$';
+const ip_addressRegx = '^(?:[0-9]{1,3}.){3}[0-9]{1,3}$';
 @Component({
   selector: 'app-firewall-add-edit',
   templateUrl: './firewall-add-edit.component.html',
@@ -16,10 +15,10 @@ export class FirewallAddEditComponent implements OnInit {
   addEditForm!: FormGroup;
   id!: string;
   isAddMode!: boolean;
-  loading: boolean = false;
-  submitted: boolean = false;
+  loading = false;
+  submitted = false;
 
-  constructor(
+  constructor (
     private formBuilder: FormBuilder,
     private lanService: LanService,
     private alertService: AlertService,
@@ -35,7 +34,7 @@ export class FirewallAddEditComponent implements OnInit {
       ip_address: ['', [Validators.required, Validators.pattern(ip_addressRegx)]]
     });
 
-    if(!this.isAddMode){
+    if (!this.isAddMode) {
       this.lanService.getRuleById(this.id)
         .pipe(first())
         .subscribe(rule => {
@@ -45,7 +44,7 @@ export class FirewallAddEditComponent implements OnInit {
     }
   }
 
-  get f() { return this.addEditForm.controls;}
+  get f() { return this.addEditForm.controls; }
 
   submit() {
     this.submitted = true;
@@ -56,10 +55,9 @@ export class FirewallAddEditComponent implements OnInit {
     }
     this.loading = true;
 
-    if(this.isAddMode){
+    if (this.isAddMode) {
       this.createRule();
-    } else
-    {
+    } else {
       this.updateRule();
     }
   }
@@ -68,8 +66,8 @@ export class FirewallAddEditComponent implements OnInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('Rule created successfully', { keepAfterRouteChange: true});
-          this.router.navigate(['../'], { relativeTo: this.route});;
+          this.alertService.success('Rule created successfully', { keepAfterRouteChange: true });
+          this.router.navigate(['../'], { relativeTo: this.route });
         },
         error: error => {
           this.alertService.error(error);
@@ -84,8 +82,8 @@ export class FirewallAddEditComponent implements OnInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('Update successful', { keepAfterRouteChange: true});
-          this.router.navigate(['../../'], { relativeTo: this.route});
+          this.alertService.success('Update successful', { keepAfterRouteChange: true });
+          this.router.navigate(['../../'], { relativeTo: this.route });
         },
         error: error => {
           this.alertService.error(error);

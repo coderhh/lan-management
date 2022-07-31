@@ -78,6 +78,6 @@ export class LanService {
     return this.http.delete(`${baseUrl}/vlanbinding/`)
     .pipe(finalize(() => {
       catchError(LanService._handleError)
-    }));;
+    }));
   }
 }

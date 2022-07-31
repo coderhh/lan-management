@@ -9,8 +9,8 @@ import { AccountService } from '../service/account.service';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-  isLoggedIn: boolean = false;
-  isAdmin: boolean = false;
+  isLoggedIn = false;
+  isAdmin = false;
   account!: Account;
   constructor(private accountService: AccountService) {
     this.accountService.account.subscribe(x => this.account = x);

@@ -19,7 +19,7 @@ export class VlanComponent implements OnInit, AfterViewInit {
 
   title = 'LAN';
   vlan: any;
-  vlanNum: string = '10';
+  vlanNum = '10';
   vlanName = '';
   network = '';
   mask = '';

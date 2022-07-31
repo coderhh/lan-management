@@ -16,8 +16,8 @@ export class AccountsAddEditComponent implements OnInit {
   addEditForm!: FormGroup;
   id!:string;
   isAddMode!: boolean;
-  loading: boolean = false;
-  submitted: boolean = false;
+  loading = false;
+  submitted = false;
   roles!: RoleInterface[];
   constructor(
     private formBuilder: FormBuilder,
