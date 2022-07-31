@@ -17,4 +17,4 @@ services:
     volumes:
       - ./backend:/app # for watching files
     ports:
-      - "5000:5000"
+      - "5001:5000"
