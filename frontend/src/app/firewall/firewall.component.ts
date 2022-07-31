@@ -57,7 +57,6 @@ export class FirewallComponent implements OnInit, AfterViewInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          //this.alertService.success('Rules deleted successfully from local DB', { keepAfterRouteChange: true});
           window.location.reload();
         },
         error: error => {
