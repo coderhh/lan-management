@@ -6,6 +6,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { first } from 'rxjs/operators';
 import { AlertService } from '../service/alert.service';
+import { AlertOption } from '../models/AlertOption';
 
 @Component({
   selector: 'app-firewall',
@@ -42,7 +43,7 @@ export class FirewallComponent implements OnInit, AfterViewInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('Rule deleted successfully', { keepAfterRouteChange: true });
+          this.alertService.success('Rule deleted successfully', new AlertOption(true));
           this.rules.filter(x => x.rule_num !== ruleNum);
           window.location.reload();
         },

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { first } from 'rxjs/operators';
+import { AlertOption } from '../models/AlertOption';
 import { AlertService } from '../service/alert.service';
 import { LanService } from '../service/lan.service';
 
@@ -70,7 +71,7 @@ export class BindAddEditComponent implements OnInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('New Bind created successfully', { keepAfterRouteChange: true });
+          this.alertService.success('New Bind created successfully', new AlertOption(true));
           this.router.navigate(['../'], { relativeTo: this.route });
         },
         error: error => {
@@ -84,7 +85,7 @@ export class BindAddEditComponent implements OnInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('Update successful', { keepAfterRouteChange: true });
+          this.alertService.success('Update successful', new AlertOption(true));
           this.router.navigate(['../../'], { relativeTo: this.route });
         },
         error: error => {
