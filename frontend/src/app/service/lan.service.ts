@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse} from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { FireWallRule } from '../models/firewallrule';
@@ -13,71 +13,67 @@ const baseUrl = `${environment.apiUrl}`;
 
 export class LanService {
 
-  constructor(private http: HttpClient) {
+  constructor (private http: HttpClient) {
   }
 
-  private static _handleError(err: HttpErrorResponse | any) {
+  private static _handleError(err: HttpErrorResponse | never): Observable<never> {
     return Observable.throw(err.message || 'Error: Unable to complete request.');
   }
 
-  getFireWallRules() {
-     return this.http.get<FireWallRule[]>(`${baseUrl}/firewallrule/`);
+  getFireWallRules(): Observable<FireWallRule[]> {
+    return this.http.get<FireWallRule[]>(`${baseUrl}/firewallrule/`);
   }
 
-  getRuleById(id: string) {
+  getRuleById(id: string): Observable<FireWallRule> {
     return this.http.get<FireWallRule>(`${baseUrl}/firewallrule/${id}`);
   }
 
-  createRule(rule: object) {
+  createRule(rule: object): Observable<unknown> {
     return this.http.post(`${baseUrl}/firewallrule/`, rule);
   }
-  updateRule(ruleNum: string, params: object){
-    return this.http.put(`${baseUrl}/firewallrule/${ruleNum}`, params)
-      .pipe(map((rule: any) => {
-        return rule;
+  updateRule(ruleNum: string, params: object): Observable<FireWallRule> {
+    return this.http.put<FireWallRule>(`${baseUrl}/firewallrule/${ruleNum}`, params)
+      .pipe(map((rule: FireWallRule) => rule));
+  }
+  deleteRule(ruleNum: string): Observable<unknown> {
+    return this.http.delete(`${baseUrl}/firewallrule/${ruleNum}`)
+      .pipe(finalize(() => {
+        catchError(LanService._handleError)
       }));
   }
-  deleteRule(ruleNum: string) {
-    return this.http.delete(`${baseUrl}/firewallrule/${ruleNum}`)
-    .pipe(finalize(() => {
-      catchError(LanService._handleError)
-    }));
-  }
 
-  deleteAllRulesFromDB() {
+  deleteAllRulesFromDB(): Observable<unknown> {
     return this.http.delete(`${baseUrl}/firewallrule/`)
-    .pipe(finalize(() => {
-      catchError(LanService._handleError)
-    }));
+      .pipe(finalize(() => {
+        catchError(LanService._handleError)
+      }));
   }
 
-  getVlanBinds(){
+  getVlanBinds(): Observable<MacIpBind[]> {
     return this.http.get<MacIpBind[]>(`${baseUrl}/vlanbinding/`);
   }
 
-  getVlanBindById(id: string) {
+  getVlanBindById(id: string): Observable<MacIpBind> {
     return this.http.get<MacIpBind>(`${baseUrl}/vlanbinding/${id}`);
   }
 
-  createBind(bind: object){
+  createBind(bind: object): Observable<unknown> {
     return this.http.post(`${baseUrl}/vlanbinding/`, bind);
   }
 
-  updateBind(bindId: string, params: object){
-    return this.http.put(`${baseUrl}/vlanbinding/${bindId}`, params)
-      .pipe(map((rule: any) => {
-        return rule;
-      }));
+  updateBind(bindId: string, params: object): Observable<MacIpBind> {
+    return this.http.put<MacIpBind>(`${baseUrl}/vlanbinding/${bindId}`, params)
+      .pipe(map((bind: MacIpBind) => bind));
   }
 
-  deleteBind(bindId: string) {
+  deleteBind(bindId: string): Observable<unknown> {
     return this.http.delete(`${baseUrl}/vlanbinding/${bindId}`);
   }
 
-  deleteAllBindFromDB() {
+  deleteAllBindFromDB(): Observable<unknown> {
     return this.http.delete(`${baseUrl}/vlanbinding/`)
-    .pipe(finalize(() => {
-      catchError(LanService._handleError)
-    }));;
+      .pipe(finalize(() => {
+        catchError(LanService._handleError)
+      }));
   }
 }

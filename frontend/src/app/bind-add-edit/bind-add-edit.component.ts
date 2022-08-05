@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { first } from 'rxjs/operators';
+import { AlertOption } from '../models/AlertOption';
 import { AlertService } from '../service/alert.service';
 import { LanService } from '../service/lan.service';
 
-const IP_ADDRESSREGX= '^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$';
+const IP_ADDRESSREGX = '^(?:[0-9]{1,3}.){3}[0-9]{1,3}$';
 const VLANREGX = '^[0-9]*$';
 @Component({
   selector: 'app-bind-add-edit',
@@ -16,10 +17,10 @@ export class BindAddEditComponent implements OnInit {
   addEditForm!: FormGroup;
   id!: string;
   isAddMode!: boolean;
-  loading: boolean = false;
-  submitted: boolean = false;
+  loading = false;
+  submitted = false;
 
-  constructor(
+  constructor (
     private formBuilder: FormBuilder,
     private lanService: LanService,
     private alertService: AlertService,
@@ -37,7 +38,7 @@ export class BindAddEditComponent implements OnInit {
       network_mask: ['', [Validators.required, Validators.pattern(IP_ADDRESSREGX)]]
     });
 
-    if(!this.isAddMode) {
+    if (!this.isAddMode) {
       this.lanService.getVlanBindById(this.id)
         .pipe(first())
         .subscribe(bind => {
@@ -46,23 +47,21 @@ export class BindAddEditComponent implements OnInit {
     }
   }
 
-  get f() { return this.addEditForm.controls;}
+  get f() { return this.addEditForm.controls; }
 
-  onSubmit(){
+  onSubmit() {
     this.submitted = true;
 
     this.alertService.clear();
-    if(this.addEditForm.invalid)
-    {
+    if (this.addEditForm.invalid) {
       return;
     }
 
     this.loading = true;
 
-    if (this.isAddMode){
+    if (this.isAddMode) {
       this.createBind();
-    }else
-    {
+    } else {
       this.updateBind();
     }
   }
@@ -72,8 +71,8 @@ export class BindAddEditComponent implements OnInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('New Bind created successfully', { keepAfterRouteChange: true});
-          this.router.navigate(['../'], { relativeTo: this.route});;
+          this.alertService.success('New Bind created successfully', new AlertOption(true));
+          this.router.navigate(['../'], { relativeTo: this.route });
         },
         error: error => {
           this.alertService.error(error);
@@ -86,8 +85,8 @@ export class BindAddEditComponent implements OnInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('Update successful', { keepAfterRouteChange: true});
-          this.router.navigate(['../../'], { relativeTo: this.route});
+          this.alertService.success('Update successful', new AlertOption(true));
+          this.router.navigate(['../../'], { relativeTo: this.route });
         },
         error: error => {
           this.alertService.error(error);

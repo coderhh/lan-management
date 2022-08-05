@@ -4,7 +4,6 @@ import {
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
-  HttpHeaders
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AccountService } from '../service/account.service';
@@ -12,13 +11,13 @@ import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
-  constructor(private accountService: AccountService) {}
+  constructor (private accountService: AccountService) { }
 
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const account = this.accountService.accountValue;
     const isLoggedIn = account && account.jwtToken;
     const isApiUrl = request.url.startsWith(environment.apiUrl);
-    if (isLoggedIn && isApiUrl){
+    if (isLoggedIn && isApiUrl) {
       // const headers = new HttpHeaders({
       //   'Authorization': `Bear ${account.jwtToken}`,
       //   'RefreshToken': `${account.refreshToken}`
