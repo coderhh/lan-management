@@ -1,5 +1,5 @@
 import { LanService } from '../service/lan.service';
-import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -15,10 +15,11 @@ import { MacIpBind } from '../models/bind';
 })
 export class VlanComponent implements OnInit, AfterViewInit {
 
-  displayedColumns: string[] = ['id', 'vlan', 'mac', 'ip', 'mask', 'action'];
+  displayedColumns: string[] = ['id','vlan', 'mac', 'ip', 'mask', 'action'];
 
   title = 'LAN';
-  vlanNum = '10';
+  vlan: any;
+  vlanNum: string = '10';
   vlanName = '';
   network = '';
   mask = '';
@@ -31,20 +32,20 @@ export class VlanComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor (
+  constructor(
     private lanService: LanService,
     private route: ActivatedRoute,
     private alertService: AlertService) {
   }
 
-  applyFilter(event: Event): void {
+  applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
   ngOnInit(): void {
     this.route.params.forEach(params => {
       this.vlanNum = params.id;
-      this.loadvlaninfo();
+      this.loadvlaninfo(this.vlanNum);
     });
   }
 
@@ -53,35 +54,36 @@ export class VlanComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
-  deleteBind(id: string): void {
+  deleteBind(id: string ): void {
     this.lanService.deleteBind(id)
-      .subscribe(
-        (): void => {
-          this.alertService.success('Deleted successful');
-          window.location.reload();
-        }, (err) => {
-          this.alertService.error(err);
-        }
-      );
+    .subscribe(
+      response => {
+        this.alertService.success('Deleted successful');
+        window.location.reload();
+      }, (err) => {
+        this.alertService.error(err);
+      }
+    );
   }
 
   deleteAllBindFromDB(): void {
     this.lanService.deleteAllBindFromDB()
-      .subscribe(
-        (): void => {
-          window.location.reload();
-        }, (err) => {
-          this.alertService.error(err);
-        }
-      );
+    .subscribe(
+      response => {
+        //this.alertService.success('All Rules Deleted successful from DB');
+        window.location.reload();
+      }, (err) => {
+        this.alertService.error(err);
+      }
+    );
   }
 
-  private loadvlaninfo(): void {
+  private loadvlaninfo(num: string): void{
     this.lanService.getVlanBinds()
-      .pipe(first())
-      .subscribe(res => {
-        this.static_bind = res;
-        this.dataSource.data = this.static_bind;
-      });
+        .pipe(first())
+        .subscribe(res => {
+          this.static_bind = res;
+          this.dataSource.data = this.static_bind;
+        });
   }
 }

@@ -1,15 +1,7 @@
-import { AuthGuard } from './auth.guard';
-import { TestBed } from '@angular/core/testing';
+import { Auth.Guard } from './auth.guard';
 
-describe('AuthGuard', () => {
-  beforeEach(() => TestBed.configureTestingModule({
-    providers: [
-      AuthGuard
-    ]
-  }));
-
-  it('should be created', () => {
-    const interceptor: AuthGuard = TestBed.inject(AuthGuard);
-    expect(interceptor).toBeTruthy();
+describe('Auth.Guard', () => {
+  it('should create an instance', () => {
+    expect(new Auth.Guard()).toBeTruthy();
   });
 });

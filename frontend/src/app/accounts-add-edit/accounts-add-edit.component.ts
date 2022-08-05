@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { first } from 'rxjs/operators';
 import { MustMatch } from '../helpers/must-match';
-import { AlertOption } from "../models/AlertOption";
 import { Role, RoleInterface } from '../models/role';
 import { AccountService } from '../service/account.service';
 import { AlertService } from '../service/alert.service';
@@ -15,12 +14,12 @@ import { AlertService } from '../service/alert.service';
 })
 export class AccountsAddEditComponent implements OnInit {
   addEditForm!: FormGroup;
-  id!: string;
+  id!:string;
   isAddMode!: boolean;
-  loading = false;
-  submitted = false;
+  loading: boolean = false;
+  submitted: boolean = false;
   roles!: RoleInterface[];
-  constructor (
+  constructor(
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
@@ -36,8 +35,8 @@ export class AccountsAddEditComponent implements OnInit {
       first_name: ['', Validators.required],
       last_name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      role: ['', Validators.required],
-      password: ['', [Validators.minLength(6), this.isAddMode ? Validators.required : Validators.nullValidator]],
+      role:['', Validators.required],
+      password:['',[Validators.minLength(6), this.isAddMode ? Validators.required: Validators.nullValidator]],
       confirmPassword: ['']
     }, {
       validator: MustMatch('password', 'confirmPassword')
@@ -47,7 +46,7 @@ export class AccountsAddEditComponent implements OnInit {
       { value: 'Admin', viewValue: Role.Admin }
     ];
 
-    if (!this.isAddMode) {
+    if(!this.isAddMode) {
       this.accountService.getById(this.id)
         .pipe(first())
         .subscribe(x => this.addEditForm.patchValue(x));
@@ -65,18 +64,18 @@ export class AccountsAddEditComponent implements OnInit {
       return;
     }
     this.loading = true;
-    if (this.isAddMode) {
+    if(this.isAddMode) {
       this.createAccount();
     } else {
       this.updateAccount();
     }
   }
-  updateAccount() {
+  updateAccount(){
     this.accountService.update(this.id, this.addEditForm.value)
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('Update successful', new AlertOption(true));
+          this.alertService.success('Update successful', { keepAfterRouteChange: true});
           this.router.navigate(['../../'], { relativeTo: this.route });
         },
         error: error => {
@@ -91,8 +90,8 @@ export class AccountsAddEditComponent implements OnInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('Account created successfully', new AlertOption(true));
-          this.router.navigate(['../'], { relativeTo: this.route });
+          this.alertService.success('Account created successfully', { keepAfterRouteChange: true});
+          this.router.navigate(['../'], { relativeTo: this.route});
         },
         error: error => {
           this.alertService.error(error);

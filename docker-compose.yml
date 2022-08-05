@@ -15,6 +15,6 @@ services:
       dockerfile: Dockerfile.dev
     container_name: "lan-backend"
     volumes:
-      - ./backend:/app # for watching files
+        - ./backend:/app # for watching files
     ports:
       - "5001:5000"

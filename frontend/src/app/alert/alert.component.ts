@@ -17,42 +17,42 @@ export class AlertComponent implements OnInit, OnDestroy {
   alerts: Alert[] = [];
   alertSubscription!: Subscription;
   routeSubscription!: Subscription;
-  constructor (private router: Router, private alertService: AlertService) { }
+  constructor(private router: Router, private alertService: AlertService) { }
 
-  ngOnInit() {
+  ngOnInit(){
     // subscribe to new alert notifications
     this.alertSubscription = this.alertService.onAlert(this.id)
-      .subscribe(alert => {
-        // clear alert when an empty alert is received
-        if (!alert.message) {
-          this.alerts = this.alerts.filter(alert => alert.keepAfterRouteChange);
-          this.alerts.forEach(alert => delete alert.keepAfterRouteChange);
-          return;
-        }
-        // add alert to array
-        this.alerts.push(alert);
+          .subscribe(alert => {
+            // clear alert when an empty alert is received
+            if (!alert.message){
+              this.alerts = this.alerts.filter(alert => alert.keepAfterRouteChange);
+              this.alerts.forEach(alert => delete alert.keepAfterRouteChange);
+              return;
+            }
+            // add alert to array
+            this.alerts.push(alert);
 
-        //auto clear alert if required
-        if (alert.autoClose) {
-          setTimeout(() => this.removeAlert(alert), 5000);
-        }
-      });
+            //auto clear alert if required
+            if (alert.autoClose){
+              setTimeout(() => this.removeAlert(alert), 5000);
+            }
+          });
     this.routeSubscription = this.router.events.subscribe(event => {
-      if (event instanceof NavigationStart) {
+      if (event instanceof NavigationStart){
         this.alertService.clear(this.id);
       }
     });
   }
 
 
-  ngOnDestroy() {
+  ngOnDestroy(){
     this.alertSubscription.unsubscribe();
     this.routeSubscription.unsubscribe();
   }
   removeAlert(alert: Alert) {
     if (!this.alerts.includes(alert)) { return; }
 
-    if (this.fade) {
+    if (this.fade){
       alert.fade = true;
       setTimeout(() => {
         this.alerts = this.alerts.filter(x => x !== alert);
@@ -75,7 +75,7 @@ export class AlertComponent implements OnInit, OnDestroy {
     };
 
     classes.push(alertTypeClass[alert.type]);
-    if (alert.fade) {
+    if (alert.fade){
       classes.push('fade');
     }
 

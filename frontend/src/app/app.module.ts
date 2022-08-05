@@ -12,7 +12,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatOptionModule } from '@angular/material/core';
-import { MatDividerModule } from '@angular/material/divider';
+import { MatDividerModule} from '@angular/material/divider';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { AppRoutingModule } from './app-routing.module';
@@ -24,6 +24,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FirewallComponent } from './firewall/firewall.component';
 import { LoginComponent } from './login/login.component';
 import { AlertComponent } from './alert/alert.component';
+import { fakeBackendProvider } from './helpers/fake-backend.interceptor';
 import { ErrorInterceptor } from './helpers/error.interceptor';
 import { AdminComponent } from './admin/admin.component';
 import { AccountsListComponent } from './accounts-list/accounts-list.component';
@@ -69,10 +70,11 @@ import { BindAddEditComponent } from './bind-add-edit/bind-add-edit.component';
     MatDividerModule
   ],
   providers: [
-    { provide: LanService, useClass: LanService },
-    { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService] },
+    { provide: LanService, useClass: LanService},
+    { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService]},
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    //fakeBackendProvider
   ],
   bootstrap: [AppComponent]
 })
