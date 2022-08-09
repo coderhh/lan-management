@@ -43,7 +43,7 @@ export class AccountsListComponent implements OnInit, AfterViewInit {
       .subscribe({
         next: () => {
           this.alertService.success('Account deleted successfully', new AlertOption(true));
-          this.accounts = this.accounts.filter(x => x.id !== id);
+          this.accounts = this.accounts.filter(x => x.public_id !== id);
           window.location.reload();
         },
         error: error => {

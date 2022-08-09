@@ -12,14 +12,14 @@ const authUrl = `${environment.apiUrl}/auth`;
   providedIn: 'root'
 })
 export class AccountService {
-  private accountSubject: BehaviorSubject<any>;
+  private accountSubject: BehaviorSubject<Account>;
   public account: Observable<Account>;
-
+  private initialAccount: Account = new Account();
   constructor (
     private http: HttpClient,
     private router: Router
   ) {
-    this.accountSubject = new BehaviorSubject<any>(null);
+    this.accountSubject = new BehaviorSubject<Account>(this.initialAccount);
     this.account = this.accountSubject.asObservable();
   }
 
@@ -27,9 +27,8 @@ export class AccountService {
     return this.accountSubject.value;
   }
 
-
-  login(email: string, password: string) {
-    return this.http.post<any>(`${authUrl}/login`, { email, password }, { withCredentials: true })
+  login(email: string, password: string): Observable<Account> {
+    return this.http.post<Account>(`${authUrl}/login`, { email, password }, { withCredentials: true })
       .pipe(map(account => {
         this.accountSubject.next(account);
         this.startRefreshTokenTimer();
@@ -37,29 +36,29 @@ export class AccountService {
       }));
   }
 
-  logout() {
-    this.http.post<any>(`${authUrl}/logout`, {}, { withCredentials: true }).subscribe();
+  logout(): void {
+    this.http.post<Account>(`${authUrl}/logout`, {}, { withCredentials: true }).subscribe();
     this.stopRefreshTokenTimer();
-    this.accountSubject.next(null);
+    this.accountSubject.next(this.initialAccount);
     this.router.navigate(['/home']);
   }
 
-  getAll() {
+  getAll(): Observable<Account[]> {
     return this.http.get<Account[]>(`${baseUrl}/`);
   }
 
-  getById(id: string) {
+  getById(id: string): Observable<Account> {
     return this.http.get<Account>(`${baseUrl}/${id}`);
   }
 
-  create(params: object) {
-    return this.http.post(`${baseUrl}/`, params);
+  create(params: object): Observable<Account> {
+    return this.http.post<Account>(`${baseUrl}/`, params);
   }
 
-  update(id: string, params: object) {
-    return this.http.put(`${baseUrl}/${id}`, params)
-      .pipe(map((account: any) => {
-        if (account.id === this.accountValue.id) {
+  update(id: string, params: object): Observable<Account> {
+    return this.http.put<Account>(`${baseUrl}/${id}`, params)
+      .pipe(map((account: Account) => {
+        if (account.public_id === this.accountValue.public_id) {
           account = { ...this.accountValue, ...account };
           this.accountSubject.next(account);
         }
@@ -70,14 +69,14 @@ export class AccountService {
   delete(id: string) {
     return this.http.delete(`${baseUrl}/${id}`)
       .pipe(finalize(() => {
-        if (id === this.accountValue.id)
+        if (id === this.accountValue.public_id)
           this.logout();
       }));
   }
 
 
-  refreshToken() {
-    return this.http.post<any>(`${authUrl}/refresh-token`, {}, { withCredentials: true })
+  refreshToken(): Observable<Account> {
+    return this.http.post<Account>(`${authUrl}/refresh-token`, {}, { withCredentials: true })
       .pipe(map((account) => {
         //console.log(account)
         this.accountSubject.next(account);
@@ -86,7 +85,7 @@ export class AccountService {
       }));
   }
 
-  private refreshTokenTimeout: any;
+  private refreshTokenTimeout!: NodeJS.Timeout;
   stopRefreshTokenTimer() {
     clearTimeout(this.refreshTokenTimeout);
   }
