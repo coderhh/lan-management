@@ -1,17 +1,39 @@
-from app.main.service.vlan_bind_service import delete_all_bindings
+#! python3
+# -*- encoding: utf-8 -*-
+'''
+@File    :   vlan_bind_controller.py
+@Time    :   2022/08/09 21:59:11
+@Author  :   yehanghan
+@Version :   1.0
+@Contact :   yehanghan@gmail.com
+'''
+
+from typing import Dict, Tuple
+
+from app.main.service.vlan_bind_service import (
+    create_new_binding, delete_a_binding, delete_all_bindings,
+    get_a_binding_by_id, get_all_bindings, update_a_binding)
+from app.main.util.decorator import admin_token_required, token_required
 from flask import request
 from flask_restx import Resource
 
-from app.main.util.decorator import token_required, admin_token_required
-from app.main.service.vlan_bind_service import get_all_bindings, create_new_binding,get_a_binding_by_id,delete_a_binding, update_a_binding
 from ..util.dto import VlanBindingDto
-from typing import Dict, Tuple
 
 api = VlanBindingDto.api
 _vlan_binding = VlanBindingDto.vlan_binding
 
+
 @api.route('/')
 class VlanBindingList(Resource):
+    """_summary_
+
+    Args:
+        Resource (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     @api.doc('list_of_vlan_binding')
     @token_required
     @api.marshal_list_with(_vlan_binding)
@@ -34,9 +56,19 @@ class VlanBindingList(Resource):
         """Delete all vlan bindings"""
         return delete_all_bindings()
 
+
 @api.route('/<binding_id>')
 @api.param('binding_id', 'The Vlan binding identifier')
 class VlanBinding(Resource):
+    """_summary_
+
+    Args:
+        Resource (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     @api.response(404, 'Vlan binding not found.')
     @api.doc('Get a vlan binding')
     @api.marshal_with(_vlan_binding)
@@ -48,6 +80,7 @@ class VlanBinding(Resource):
             api.abort(404)
         else:
             return binding
+
     @api.doc('Delete a vlan binding')
     @token_required
     def delete(self, binding_id) -> Tuple[Dict[str, str], int]:
@@ -62,9 +95,3 @@ class VlanBinding(Resource):
         """Update a vlan binding """
         data = request.json
         return update_a_binding(data=data, binding_id=binding_id)
-
-
-
-
-
-

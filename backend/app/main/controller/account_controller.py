@@ -1,10 +1,23 @@
+#! python3
+# -*- encoding: utf-8 -*-
+'''
+@File    :   account_controller.py
+@Time    :   2022/08/09 21:56:30
+@Author  :   yehanghan
+@Version :   1.0
+@Contact :   yehanghan@gmail.com
+'''
+
+from typing import Dict, Tuple
+
+from app.main.util.decorator import admin_token_required
 from flask import request
 from flask_restx import Resource
 
-from app.main.util.decorator import admin_token_required
+from ..service.account_service import (delete_a_account, get_a_account_by_id,
+                                       get_all_accounts, save_new_account,
+                                       update_an_account)
 from ..util.dto import AccountDto
-from ..service.account_service import save_new_account, get_all_accounts, get_a_account_by_id, delete_a_account, update_an_account
-from typing import Dict, Tuple
 
 api = AccountDto.api
 _account = AccountDto.account
@@ -12,6 +25,15 @@ _account = AccountDto.account
 
 @api.route('/')
 class AccountList(Resource):
+    """_summary_
+
+    Args:
+        Resource (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     @api.doc('list_of_registered_account')
     @admin_token_required
     @api.marshal_list_with(_account)
@@ -29,9 +51,19 @@ class AccountList(Resource):
 
         return save_new_account(data=data)
 
+
 @api.route('/<public_id>')
 @api.param('public_id', 'The User identifier')
 class Account(Resource):
+    """_summary_
+
+    Args:
+        Resource (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     @api.response(404, 'Account not found.')
     @api.doc('get an account')
     @api.marshal_with(_account)
@@ -42,6 +74,7 @@ class Account(Resource):
             api.abort(404)
         else:
             return account
+
     @api.doc('delete an account')
     @admin_token_required
     def delete(self, public_id):
@@ -56,9 +89,3 @@ class Account(Resource):
         """Update an Account """
         data = request.json
         return update_an_account(data=data, public_id=public_id)
-
-
-
-
-
-

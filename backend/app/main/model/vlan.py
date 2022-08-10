@@ -1,3 +1,13 @@
+#! python3
+# -*- encoding: utf-8 -*-
+'''
+@File    :   vlan.py
+@Time    :   2022/08/10 10:12:49
+@Author  :   yehanghan
+@Version :   1.0
+@Contact :   yehanghan@gmail.com
+'''
+
 from .. import db
 
 
@@ -16,23 +26,47 @@ class VlanBinding(db.Model):
     updated_on = db.Column(db.DateTime)
 
     def __repr__(self):
-        return '<binding: ip: {} mac: {} created_on: {} updated_on: {}'.format(self.ip_address, self.mac_address, self.created_on, self.updated_on)
+        """_summary_
+
+        Returns:
+            _type_: _description_
+        """
+        msg = (f'<binding: ip: {self.ip_address} mac: {self.mac_address} '
+               f'created_on: {self.created_on} updated_on: {self.updated_on}')
+        return msg
 
     @staticmethod
-    def check_binding(ip: str, mac: str) -> bool:
+    def check_binding(ip_addr: str, mac: str) -> bool:
+        """_summary_
+
+        Args:
+            ip (str): _description_
+            mac (str): _description_
+
+        Returns:
+            bool: _description_
+        """
         # check whether ip or mac was already binded
-        res = VlanBinding.query.filter(VlanBinding.ip_address == ip or VlanBinding.mac_address == mac).first()
-        if res:
-            return True
-        else:
-            return False
+        res = VlanBinding.query.filter(
+            VlanBinding.ip_address == ip_addr
+            or VlanBinding.mac_address == mac).first()
+        return bool(res)
 
     @staticmethod
-    def check_binding_id(ip: str, mac: str, id:str) -> bool:
+    def check_binding_id(ip_addr: str, mac: str, binding_id: str) -> bool:
+        """_summary_
+
+        Args:
+            ip (str): _description_
+            mac (str): _description_
+            binding_id (str): _description_
+
+        Returns:
+            bool: _description_
+        """
         # check whether ip or mac was already binded
-        res = VlanBinding.query.filter((VlanBinding.ip_address == ip or VlanBinding.mac_address == mac)).first()
-        resd = res.query.filter(str(VlanBinding.id) != id)
-        if resd:
-            return True
-        else:
-            return False
+        res = VlanBinding.query.filter(
+            (VlanBinding.ip_address == ip_addr
+             or VlanBinding.mac_address == mac)).first()
+        resd = res.query.filter(str(VlanBinding.id) != binding_id)
+        return bool(resd)

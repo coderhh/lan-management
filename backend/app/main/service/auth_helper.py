@@ -10,11 +10,17 @@ from typing import Dict, Tuple
 from app.main import db
 
 api = AuthDto.api
+
+
 class Auth:
+
     @staticmethod
-    def login_account(data: Dict[str, str], ip: string) -> Tuple[Dict[str, str], int]:
+    def login_account(data: Dict[str, str],
+                      ip: string) -> Tuple[Dict[str, str], int]:
         try:
-            api.logger.info('User {} is trying to login from IP ADDRESS: {}'.format(data.get('email'),ip))
+            api.logger.info(
+                'User {} is trying to login from IP ADDRESS: {}'.format(
+                    data.get('email'), ip))
             # fetch the user data
             account = Account.query.filter_by(email=data.get('email')).first()
             if account and account.check_password(data.get('password')):
@@ -43,14 +49,12 @@ class Auth:
                 return response_object, 401
         except Exception as e:
             api.logger.error(e)
-            response_object = {
-                'status': 'fail',
-                'message': 'Try again'
-            }
+            response_object = {'status': 'fail', 'message': 'Try again'}
             return response_object, 500
 
     @staticmethod
-    def logout_account(data: str, refresh_token: str, ip: str) -> Tuple[Dict[str, str], int]:
+    def logout_account(data: str, refresh_token: str,
+                       ip: str) -> Tuple[Dict[str, str], int]:
         if data:
             if " " in data:
                 auth_token = data.split(" ")[1]
@@ -62,12 +66,11 @@ class Auth:
             resp = Account.decode_auth_token(auth_token)
             if not isinstance(resp, str):
                 # mark the token as blacklisted
-                return black_list_token(token=auth_token, r_token = refresh_token, ip = ip)
+                return black_list_token(token=auth_token,
+                                        r_token=refresh_token,
+                                        ip=ip)
             else:
-                response_object = {
-                    'status': 'fail',
-                    'message': resp
-                }
+                response_object = {'status': 'fail', 'message': resp}
                 return response_object, 401
         else:
             response_object = {
@@ -94,10 +97,7 @@ class Auth:
                     }
                 }
                 return response_object, 200
-            response_object = {
-                'status': 'fail',
-                'message': resp
-            }
+            response_object = {'status': 'fail', 'message': resp}
             return response_object, 401
         else:
             response_object = {
@@ -109,16 +109,22 @@ class Auth:
     @staticmethod
     def refresh_token(token: str, ip: str) -> Tuple[Dict[str, str], int]:
         try:
-            account = Account.query.join(RefreshToken).filter(RefreshToken.token == token).first()
+            account = Account.query.join(RefreshToken).filter(
+                RefreshToken.token == token).first()
             if not account:
-                api.logger.warning('invalid refresh token, can not find current account')
+                api.logger.warning(
+                    'invalid refresh token, can not find current account')
                 response_object = {
-                    'status':'fail',
-                    'message':'invalid refresh token, can not find current account'
+                    'status':
+                    'fail',
+                    'message':
+                    'invalid refresh token, can not find current account'
                 }
                 return response_object, 401
             new_refresh_token = Account.encode_refresh_token(ip)
-            token_iterator = filter(lambda refresh_token: refresh_token.token == token, account.refresh_tokens)
+            token_iterator = filter(
+                lambda refresh_token: refresh_token.token == token,
+                account.refresh_tokens)
             refresh_token = list(token_iterator)[0]
             refresh_token.revoked = datetime.datetime.now()
             refresh_token.revoked_by_ip = ip
@@ -139,23 +145,17 @@ class Auth:
             return response_object, 200
         except Exception as e:
             api.logger.error(e)
-            response_object = {
-                'status': 'fail',
-                'message':'try again'
-            }
+            response_object = {'status': 'fail', 'message': 'try again'}
             return response_object, 500
+
     @staticmethod
     def get_all_blacked_token() -> Tuple[Dict[str, str], int]:
         return get_all_blacked_token()
 
-
     @staticmethod
-    def ip_address(request)-> string:
+    def ip_address(request) -> string:
         if request.headers.getlist("X-Forwarded-For"):
             ip = request.headers.getlist("X-Forwarded-For")[0]
         else:
             ip = request.remote_addr
         return ip
-
-
-
