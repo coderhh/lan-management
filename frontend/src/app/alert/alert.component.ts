@@ -17,16 +17,19 @@ export class AlertComponent implements OnInit, OnDestroy {
   alerts: Alert[] = [];
   alertSubscription!: Subscription;
   routeSubscription!: Subscription;
-  constructor (private router: Router, private alertService: AlertService) { }
+  constructor(private router: Router, private alertService: AlertService) {}
 
   ngOnInit() {
     // subscribe to new alert notifications
-    this.alertSubscription = this.alertService.onAlert(this.id)
-      .subscribe(alert => {
+    this.alertSubscription = this.alertService
+      .onAlert(this.id)
+      .subscribe((alert) => {
         // clear alert when an empty alert is received
         if (!alert.message) {
-          this.alerts = this.alerts.filter(alert => alert.keepAfterRouteChange);
-          this.alerts.forEach(alert => delete alert.keepAfterRouteChange);
+          this.alerts = this.alerts.filter(
+            (alert) => alert.keepAfterRouteChange
+          );
+          this.alerts.forEach((alert) => delete alert.keepAfterRouteChange);
           return;
         }
         // add alert to array
@@ -37,33 +40,36 @@ export class AlertComponent implements OnInit, OnDestroy {
           setTimeout(() => this.removeAlert(alert), 5000);
         }
       });
-    this.routeSubscription = this.router.events.subscribe(event => {
+    this.routeSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
         this.alertService.clear(this.id);
       }
     });
   }
 
-
   ngOnDestroy() {
     this.alertSubscription.unsubscribe();
     this.routeSubscription.unsubscribe();
   }
   removeAlert(alert: Alert) {
-    if (!this.alerts.includes(alert)) { return; }
+    if (!this.alerts.includes(alert)) {
+      return;
+    }
 
     if (this.fade) {
       alert.fade = true;
       setTimeout(() => {
-        this.alerts = this.alerts.filter(x => x !== alert);
+        this.alerts = this.alerts.filter((x) => x !== alert);
       }, 250);
     } else {
-      this.alerts = this.alerts.filter(x => x !== alert);
+      this.alerts = this.alerts.filter((x) => x !== alert);
     }
   }
 
   cssClasses(alert: Alert) {
-    if (!alert) { return ""; }
+    if (!alert) {
+      return '';
+    }
 
     const classes = ['alert', 'alert-dismissable'];
 

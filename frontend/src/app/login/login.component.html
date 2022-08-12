@@ -4,13 +4,25 @@
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <p>
         <mat-form-field>
-          <input type="text" matInput placeholder="Email" formControlName="email" required>
+          <input
+            type="text"
+            matInput
+            placeholder="Email"
+            formControlName="email"
+            required
+          />
           <mat-error *ngIf="f.email.invalid"></mat-error>
         </mat-form-field>
       </p>
       <p>
         <mat-form-field>
-          <input type="password" matInput placeholder="Password" formControlName="password" required>
+          <input
+            type="password"
+            matInput
+            placeholder="Password"
+            formControlName="password"
+            required
+          />
           <mat-error *ngIf="f.password.invalid"></mat-error>
         </mat-form-field>
       </p>

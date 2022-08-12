@@ -11,18 +11,42 @@ import { FirewallAddEditComponent } from './firewall-add-edit/firewall-add-edit.
 import { BindAddEditComponent } from './bind-add-edit/bind-add-edit.component';
 
 const routes: Routes = [
-  { path: '', component: HomeComponent},
+  { path: '', component: HomeComponent },
   { path: 'home', component: HomeComponent },
   { path: 'vlan', component: VlanComponent, canActivate: [AuthGuard] },
   { path: 'firewall', component: FirewallComponent, canActivate: [AuthGuard] },
-  { path: 'firewall/edit/:id', component: FirewallAddEditComponent, canActivate:[AuthGuard]},
-  { path: 'firewall/add', component: FirewallAddEditComponent, canActivate: [AuthGuard]},
-  { path: 'vlan/edit/:id', component: BindAddEditComponent, canActivate:[AuthGuard]},
-  { path: 'vlan/add', component: BindAddEditComponent, canActivate: [AuthGuard]},
-  { path: 'login', component: LoginComponent},
-  { path: 'admin', component: AdminComponent, canActivate: [AuthGuard]},
-  { path: 'admin/edit/:id', component: AccountsAddEditComponent, canActivate: [AuthGuard] },
-  { path: 'admin/add', component: AccountsAddEditComponent,canActivate: [AuthGuard]},
+  {
+    path: 'firewall/edit/:id',
+    component: FirewallAddEditComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'firewall/add',
+    component: FirewallAddEditComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'vlan/edit/:id',
+    component: BindAddEditComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'vlan/add',
+    component: BindAddEditComponent,
+    canActivate: [AuthGuard]
+  },
+  { path: 'login', component: LoginComponent },
+  { path: 'admin', component: AdminComponent, canActivate: [AuthGuard] },
+  {
+    path: 'admin/edit/:id',
+    component: AccountsAddEditComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'admin/add',
+    component: AccountsAddEditComponent,
+    canActivate: [AuthGuard]
+  },
   { path: '**', redirectTo: '' }
 ];
 
@@ -30,4 +54,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

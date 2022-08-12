@@ -8,8 +8,7 @@ describe('VlanComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [VlanComponent]
-    })
-      .compileComponents();
+    }).compileComponents();
   });
 
   beforeEach(() => {

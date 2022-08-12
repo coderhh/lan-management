@@ -14,13 +14,13 @@ export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   loading = false;
   submitted = false;
-  constructor (
+  constructor(
     private formBuilder: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
     private accountService: AccountService,
     private alertService: AlertService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
@@ -28,7 +28,9 @@ export class LoginComponent implements OnInit {
       password: ['', Validators.required]
     });
   }
-  get f() { return this.loginForm.controls; }
+  get f() {
+    return this.loginForm.controls;
+  }
 
   onSubmit() {
     this.submitted = true;
@@ -36,15 +38,17 @@ export class LoginComponent implements OnInit {
       return;
     }
     this.loading = true;
-    this.accountService.login(this.f.email.value, this.f.password.value)
+    this.accountService
+      .login(this.f.email.value, this.f.password.value)
       .pipe(first())
       .subscribe({
         next: () => {
-          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
+          const returnUrl =
+            this.route.snapshot.queryParams['returnUrl'] || '/home';
           this.router.navigateByUrl(returnUrl);
           //window.location.reload();
         },
-        error: error => {
+        error: (error) => {
           this.alertService.error(error);
           this.loading = false;
         }

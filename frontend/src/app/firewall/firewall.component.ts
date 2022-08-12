@@ -16,13 +16,15 @@ import { AlertOption } from '../models/AlertOption';
 export class FirewallComponent implements OnInit, AfterViewInit {
   rules: FireWallRule[] = [];
   displayedColumns: string[] = ['rule_num', 'ip', 'action'];
-  dataSource: MatTableDataSource<FireWallRule> = new MatTableDataSource<FireWallRule>();
+  dataSource: MatTableDataSource<FireWallRule> =
+    new MatTableDataSource<FireWallRule>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatTable) table!: MatTable<FireWallRule>;
-  constructor (
+  constructor(
     public lanService: LanService,
-    private alertService: AlertService) { }
+    private alertService: AlertService
+  ) {}
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
@@ -30,37 +32,43 @@ export class FirewallComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.lanService.getFireWallRules()
+    this.lanService
+      .getFireWallRules()
       .pipe(first())
-      .subscribe(rules => {
+      .subscribe((rules) => {
         this.rules = rules;
         this.dataSource.data = this.rules;
       });
   }
 
   deleteRule(ruleNum: string): void {
-    this.lanService.deleteRule(ruleNum)
+    this.lanService
+      .deleteRule(ruleNum)
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('Rule deleted successfully', new AlertOption(true));
-          this.rules.filter(x => x.rule_num !== ruleNum);
+          this.alertService.success(
+            'Rule deleted successfully',
+            new AlertOption(true)
+          );
+          this.rules.filter((x) => x.rule_num !== ruleNum);
           window.location.reload();
         },
-        error: error => {
+        error: (error) => {
           this.alertService.error(error);
         }
       });
   }
 
   deleteAllRulesFromDB(): void {
-    this.lanService.deleteAllRulesFromDB()
+    this.lanService
+      .deleteAllRulesFromDB()
       .pipe(first())
       .subscribe({
         next: () => {
           window.location.reload();
         },
-        error: error => {
+        error: (error) => {
           this.alertService.error(error);
         }
       });

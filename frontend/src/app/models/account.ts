@@ -9,7 +9,14 @@ export class Account {
   /**
    *
    */
-  constructor (id?: string, firstName?: string, lastName?: string, email?: string, role?: string, jwtToken?: string) {
+  constructor(
+    id?: string,
+    firstName?: string,
+    lastName?: string,
+    email?: string,
+    role?: string,
+    jwtToken?: string
+  ) {
     this.public_id = id;
     this.first_name = firstName;
     this.last_name = lastName;

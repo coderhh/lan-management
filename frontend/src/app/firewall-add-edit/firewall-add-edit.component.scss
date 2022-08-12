@@ -1,17 +1,16 @@
-.example-container{
-  text-align: center
+.example-container {
+  text-align: center;
 }
 
-.form-container{
+.form-container {
   width: 400px;
   margin: 0px auto;
-  margin-top: 200px
+  margin-top: 200px;
 }
 
-.form-field{
-  display: block
+.form-field {
+  display: block;
 }
-
 
 :host {
   display: flex;

@@ -20,13 +20,13 @@ export class BindAddEditComponent implements OnInit {
   loading = false;
   submitted = false;
 
-  constructor (
+  constructor(
     private formBuilder: FormBuilder,
     private lanService: LanService,
     private alertService: AlertService,
     private router: Router,
     private route: ActivatedRoute
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.id = this.route.snapshot.params['id'];
@@ -34,20 +34,29 @@ export class BindAddEditComponent implements OnInit {
     this.addEditForm = this.formBuilder.group({
       vlan_id: ['', [Validators.required, Validators.pattern(VLANREGX)]],
       mac_address: ['', [Validators.required]],
-      ip_address: ['', [Validators.required, Validators.pattern(IP_ADDRESSREGX)]],
-      network_mask: ['', [Validators.required, Validators.pattern(IP_ADDRESSREGX)]]
+      ip_address: [
+        '',
+        [Validators.required, Validators.pattern(IP_ADDRESSREGX)]
+      ],
+      network_mask: [
+        '',
+        [Validators.required, Validators.pattern(IP_ADDRESSREGX)]
+      ]
     });
 
     if (!this.isAddMode) {
-      this.lanService.getVlanBindById(this.id)
+      this.lanService
+        .getVlanBindById(this.id)
         .pipe(first())
-        .subscribe(bind => {
-          this.addEditForm.patchValue(bind)
+        .subscribe((bind) => {
+          this.addEditForm.patchValue(bind);
         });
     }
   }
 
-  get f() { return this.addEditForm.controls; }
+  get f() {
+    return this.addEditForm.controls;
+  }
 
   onSubmit() {
     this.submitted = true;
@@ -67,28 +76,33 @@ export class BindAddEditComponent implements OnInit {
   }
 
   createBind() {
-    this.lanService.createBind(this.addEditForm.value)
+    this.lanService
+      .createBind(this.addEditForm.value)
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('New Bind created successfully', new AlertOption(true));
+          this.alertService.success(
+            'New Bind created successfully',
+            new AlertOption(true)
+          );
           this.router.navigate(['../'], { relativeTo: this.route });
         },
-        error: error => {
+        error: (error) => {
           this.alertService.error(error);
           this.loading = false;
         }
       });
   }
   updateBind() {
-    this.lanService.updateBind(this.id, this.addEditForm.value)
+    this.lanService
+      .updateBind(this.id, this.addEditForm.value)
       .pipe(first())
       .subscribe({
         next: () => {
           this.alertService.success('Update successful', new AlertOption(true));
           this.router.navigate(['../../'], { relativeTo: this.route });
         },
-        error: error => {
+        error: (error) => {
           this.alertService.error(error);
           this.loading = false;
         }

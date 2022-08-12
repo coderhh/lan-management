@@ -10,14 +10,15 @@ const baseUrl = `${environment.apiUrl}`;
 @Injectable({
   providedIn: 'root'
 })
-
 export class LanService {
+  constructor(private http: HttpClient) {}
 
-  constructor (private http: HttpClient) {
-  }
-
-  private static _handleError(err: HttpErrorResponse | never): Observable<never> {
-    return Observable.throw(err.message || 'Error: Unable to complete request.');
+  private static _handleError(
+    err: HttpErrorResponse | never
+  ): Observable<never> {
+    return Observable.throw(
+      err.message || 'Error: Unable to complete request.'
+    );
   }
 
   getFireWallRules(): Observable<FireWallRule[]> {
@@ -32,21 +33,24 @@ export class LanService {
     return this.http.post(`${baseUrl}/firewallrule/`, rule);
   }
   updateRule(ruleNum: string, params: object): Observable<FireWallRule> {
-    return this.http.put<FireWallRule>(`${baseUrl}/firewallrule/${ruleNum}`, params)
+    return this.http
+      .put<FireWallRule>(`${baseUrl}/firewallrule/${ruleNum}`, params)
       .pipe(map((rule: FireWallRule) => rule));
   }
   deleteRule(ruleNum: string): Observable<unknown> {
-    return this.http.delete(`${baseUrl}/firewallrule/${ruleNum}`)
-      .pipe(finalize(() => {
-        catchError(LanService._handleError)
-      }));
+    return this.http.delete(`${baseUrl}/firewallrule/${ruleNum}`).pipe(
+      finalize(() => {
+        catchError(LanService._handleError);
+      })
+    );
   }
 
   deleteAllRulesFromDB(): Observable<unknown> {
-    return this.http.delete(`${baseUrl}/firewallrule/`)
-      .pipe(finalize(() => {
-        catchError(LanService._handleError)
-      }));
+    return this.http.delete(`${baseUrl}/firewallrule/`).pipe(
+      finalize(() => {
+        catchError(LanService._handleError);
+      })
+    );
   }
 
   getVlanBinds(): Observable<MacIpBind[]> {
@@ -62,7 +66,8 @@ export class LanService {
   }
 
   updateBind(bindId: string, params: object): Observable<MacIpBind> {
-    return this.http.put<MacIpBind>(`${baseUrl}/vlanbinding/${bindId}`, params)
+    return this.http
+      .put<MacIpBind>(`${baseUrl}/vlanbinding/${bindId}`, params)
       .pipe(map((bind: MacIpBind) => bind));
   }
 
@@ -71,9 +76,10 @@ export class LanService {
   }
 
   deleteAllBindFromDB(): Observable<unknown> {
-    return this.http.delete(`${baseUrl}/vlanbinding/`)
-      .pipe(finalize(() => {
-        catchError(LanService._handleError)
-      }));
+    return this.http.delete(`${baseUrl}/vlanbinding/`).pipe(
+      finalize(() => {
+        catchError(LanService._handleError);
+      })
+    );
   }
 }

@@ -19,33 +19,39 @@ export class FirewallAddEditComponent implements OnInit {
   loading = false;
   submitted = false;
 
-  constructor (
+  constructor(
     private formBuilder: FormBuilder,
     private lanService: LanService,
     private alertService: AlertService,
     private router: Router,
-    private route: ActivatedRoute) {
-  }
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
     this.id = this.route.snapshot.params['id'];
     this.isAddMode = !this.id;
 
     this.addEditForm = this.formBuilder.group({
-      ip_address: ['', [Validators.required, Validators.pattern(ip_addressRegx)]]
+      ip_address: [
+        '',
+        [Validators.required, Validators.pattern(ip_addressRegx)]
+      ]
     });
 
     if (!this.isAddMode) {
-      this.lanService.getRuleById(this.id)
+      this.lanService
+        .getRuleById(this.id)
         .pipe(first())
-        .subscribe(rule => {
+        .subscribe((rule) => {
           this.addEditForm.patchValue(rule);
           this.loading = false;
         });
     }
   }
 
-  get f() { return this.addEditForm.controls; }
+  get f() {
+    return this.addEditForm.controls;
+  }
 
   submit() {
     this.submitted = true;
@@ -63,14 +69,18 @@ export class FirewallAddEditComponent implements OnInit {
     }
   }
   createRule() {
-    this.lanService.createRule(this.addEditForm.value)
+    this.lanService
+      .createRule(this.addEditForm.value)
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('Rule created successfully', new AlertOption(true));
+          this.alertService.success(
+            'Rule created successfully',
+            new AlertOption(true)
+          );
           this.router.navigate(['../'], { relativeTo: this.route });
         },
-        error: error => {
+        error: (error) => {
           this.alertService.error(error);
           this.loading = false;
         }
@@ -79,14 +89,15 @@ export class FirewallAddEditComponent implements OnInit {
 
   // method to update existing rule
   updateRule() {
-    this.lanService.updateRule(this.id, this.addEditForm.value)
+    this.lanService
+      .updateRule(this.id, this.addEditForm.value)
       .pipe(first())
       .subscribe({
         next: () => {
           this.alertService.success('Update successful', new AlertOption(true));
           this.router.navigate(['../../'], { relativeTo: this.route });
         },
-        error: error => {
+        error: (error) => {
           this.alertService.error(error);
           this.loading = false;
         }

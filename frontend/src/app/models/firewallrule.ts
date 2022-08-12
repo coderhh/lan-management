@@ -3,7 +3,7 @@
 //     ip_address: string;
 //   }
 
-export class FireWallRule{
+export class FireWallRule {
   public rule_num!: string;
   public ip_address!: string;
 }

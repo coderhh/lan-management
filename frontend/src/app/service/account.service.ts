@@ -15,10 +15,7 @@ export class AccountService {
   private accountSubject: BehaviorSubject<Account>;
   public account: Observable<Account>;
   private initialAccount: Account = new Account();
-  constructor (
-    private http: HttpClient,
-    private router: Router
-  ) {
+  constructor(private http: HttpClient, private router: Router) {
     this.accountSubject = new BehaviorSubject<Account>(this.initialAccount);
     this.account = this.accountSubject.asObservable();
   }
@@ -28,16 +25,25 @@ export class AccountService {
   }
 
   login(email: string, password: string): Observable<Account> {
-    return this.http.post<Account>(`${authUrl}/login`, { email, password }, { withCredentials: true })
-      .pipe(map(account => {
-        this.accountSubject.next(account);
-        this.startRefreshTokenTimer();
-        return account;
-      }));
+    return this.http
+      .post<Account>(
+        `${authUrl}/login`,
+        { email, password },
+        { withCredentials: true }
+      )
+      .pipe(
+        map((account) => {
+          this.accountSubject.next(account);
+          this.startRefreshTokenTimer();
+          return account;
+        })
+      );
   }
 
   logout(): void {
-    this.http.post<Account>(`${authUrl}/logout`, {}, { withCredentials: true }).subscribe();
+    this.http
+      .post<Account>(`${authUrl}/logout`, {}, { withCredentials: true })
+      .subscribe();
     this.stopRefreshTokenTimer();
     this.accountSubject.next(this.initialAccount);
     this.router.navigate(['/home']);
@@ -56,33 +62,36 @@ export class AccountService {
   }
 
   update(id: string, params: object): Observable<Account> {
-    return this.http.put<Account>(`${baseUrl}/${id}`, params)
-      .pipe(map((account: Account) => {
+    return this.http.put<Account>(`${baseUrl}/${id}`, params).pipe(
+      map((account: Account) => {
         if (account.public_id === this.accountValue.public_id) {
           account = { ...this.accountValue, ...account };
           this.accountSubject.next(account);
         }
         return account;
-      }));
+      })
+    );
   }
 
   delete(id: string) {
-    return this.http.delete(`${baseUrl}/${id}`)
-      .pipe(finalize(() => {
-        if (id === this.accountValue.public_id)
-          this.logout();
-      }));
+    return this.http.delete(`${baseUrl}/${id}`).pipe(
+      finalize(() => {
+        if (id === this.accountValue.public_id) this.logout();
+      })
+    );
   }
 
-
   refreshToken(): Observable<Account> {
-    return this.http.post<Account>(`${authUrl}/refresh-token`, {}, { withCredentials: true })
-      .pipe(map((account) => {
-        //console.log(account)
-        this.accountSubject.next(account);
-        this.startRefreshTokenTimer();
-        return account;
-      }));
+    return this.http
+      .post<Account>(`${authUrl}/refresh-token`, {}, { withCredentials: true })
+      .pipe(
+        map((account) => {
+          //console.log(account)
+          this.accountSubject.next(account);
+          this.startRefreshTokenTimer();
+          return account;
+        })
+      );
   }
 
   private refreshTokenTimeout!: NodeJS.Timeout;
@@ -96,8 +105,11 @@ export class AccountService {
       const jwtToken = JSON.parse(atob(jwtTokenEncoded.split('.')[1]));
       // set a timeout to refresh the token a minute before it expires
       const expires = new Date(jwtToken.exp * 1000);
-      const timeout = expires.getTime() - Date.now() - (60 * 1000);
-      this.refreshTokenTimeout = setTimeout(() => this.refreshToken().subscribe(), timeout);
+      const timeout = expires.getTime() - Date.now() - 60 * 1000;
+      this.refreshTokenTimeout = setTimeout(
+        () => this.refreshToken().subscribe(),
+        timeout
+      );
     }
   }
 }

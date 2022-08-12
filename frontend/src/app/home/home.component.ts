@@ -12,8 +12,8 @@ export class HomeComponent implements OnInit {
   isLoggedIn = false;
   isAdmin = false;
   account!: Account;
-  constructor (private accountService: AccountService) {
-    this.accountService.account.subscribe(x => this.account = x);
+  constructor(private accountService: AccountService) {
+    this.accountService.account.subscribe((x) => (this.account = x));
   }
 
   ngOnInit(): void {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { Alert } from '../models/alert';
-import { AlertOption } from "../models/AlertOption";
+import { AlertOption } from '../models/AlertOption';
 import { AlertType } from '../models/alert-type.enum';
 
 @Injectable({
@@ -13,7 +13,9 @@ export class AlertService {
   private defaultId = 'default-alert';
   // enable subscribing to alert service
   onAlert(id = this.defaultId): Observable<Alert> {
-    return this.subject.asObservable().pipe(filter(item => item && item.id === id));
+    return this.subject
+      .asObservable()
+      .pipe(filter((item) => item && item.id === id));
   }
 
   success(message: string, options?: AlertOption): void {
@@ -34,7 +36,7 @@ export class AlertService {
 
   alert(alert: Alert): void {
     alert.id = alert.id || this.defaultId;
-    alert.autoClose = (alert.autoClose === undefined ? true : alert.autoClose);
+    alert.autoClose = alert.autoClose === undefined ? true : alert.autoClose;
     this.subject.next(alert);
   }
 
