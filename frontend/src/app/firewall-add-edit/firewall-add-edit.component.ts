@@ -6,7 +6,7 @@ import { AlertOption } from '../models/AlertOption';
 import { AlertService } from '../service/alert.service';
 import { LanService } from '../service/lan.service';
 
-const ip_addressRegx = '^(?:[0-9]{1,3}.){3}[0-9]{1,3}$';
+const ipAddressRegx = '^(?:[0-9]{1,3}.){3}[0-9]{1,3}$';
 @Component({
   selector: 'app-firewall-add-edit',
   templateUrl: './firewall-add-edit.component.html',
@@ -32,10 +32,7 @@ export class FirewallAddEditComponent implements OnInit {
     this.isAddMode = !this.id;
 
     this.addEditForm = this.formBuilder.group({
-      ip_address: [
-        '',
-        [Validators.required, Validators.pattern(ip_addressRegx)]
-      ]
+      ip_address: ['', [Validators.required, Validators.pattern(ipAddressRegx)]]
     });
 
     if (!this.isAddMode) {

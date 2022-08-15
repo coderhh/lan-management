@@ -8,12 +8,12 @@
 @Contact :   yehanghan@gmail.com
 '''
 
+import logging
 from typing import Dict, Tuple
 
 from app.main.util.decorator import admin_token_required
 from flask import request
 from flask_restx import Resource
-import logging
 
 from ..service.account_service import (delete_a_account, get_a_account_by_id,
                                        get_all_accounts, save_new_account,

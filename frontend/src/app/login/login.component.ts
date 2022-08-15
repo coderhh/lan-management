@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit {
           const returnUrl =
             this.route.snapshot.queryParams['returnUrl'] || '/home';
           this.router.navigateByUrl(returnUrl);
-          //window.location.reload();
+          // window.location.reload();
         },
         error: (error) => {
           this.alertService.error(error);
