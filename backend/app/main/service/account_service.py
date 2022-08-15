@@ -9,6 +9,7 @@
 '''
 
 import datetime
+import logging
 import uuid
 from typing import Dict, Tuple
 
@@ -18,7 +19,7 @@ from app.main.model.account import Account
 from ..util.dto import AccountDto
 
 api = AccountDto.api
-
+logger = logging.getLogger(__name__)
 
 def save_new_account(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
     """_summary_
@@ -29,24 +30,26 @@ def save_new_account(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
     Returns:
         Tuple[Dict[str, str], int]: _description_
     """
-    account = Account.query.filter_by(email=data['email']).first()
-    if not account:
-        new_account = Account(public_id=str(uuid.uuid4()),
-                              email=data['email'],
-                              first_name=data['first_name'],
-                              last_name=data['last_name'],
-                              role=data['role'],
-                              password=data['password'],
-                              created_on=datetime.datetime.now())
-        db.session.add(data)
-        db.session.commit()
-        return generate_token(new_account)
-    else:
-        response_object = {
-            'status': 'fail',
-            'message': 'Account already exists. Please Log in.',
-        }
-        return response_object, 409
+    try:
+        account = Account.query.filter_by(email=data['email']).first()
+        if not account:
+            new_account = Account(public_id=str(uuid.uuid4()),
+                                email=data['email'],
+                                first_name=data['first_name'],
+                                last_name=data['last_name'],
+                                role=data['role'],
+                                password=data['password'],
+                                created_on=datetime.datetime.now())
+            save_changes(new_account)
+            return generate_token(new_account)
+        else:
+            response_object = {
+                'status': 'fail',
+                'message': 'Account already exists. Please Log in.',
+            }
+            return response_object, 409
+    except RuntimeError as e_msg:
+        logger.error(e_msg)
 
 
 def update_an_account(data: Dict[str, str],
@@ -162,3 +165,11 @@ def generate_token(account: Account) -> Tuple[Dict[str, str], int]:
             'message': 'Some error occurred. Please try again.'
         }
         return response_object, 401
+def save_changes(data: Account) -> None:
+    """_summary_
+
+    Args:
+        data (Account): _description_
+    """
+    db.session.add(data)
+    db.session.commit()

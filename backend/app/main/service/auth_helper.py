@@ -76,8 +76,7 @@ class Auth:
             return response_object, 500
 
     @staticmethod
-    def logout_account(data: str, refresh_token: str,
-                       ip_addr: str) -> Tuple[Dict[str, str], int]:
+    def logout_account(data: str, refresh_token:str) -> Tuple[Dict[str, str], int]:
         """_summary_
 
         Args:
@@ -100,8 +99,7 @@ class Auth:
             if not isinstance(resp, str):
                 # mark the token as blacklisted
                 return black_list_token(token=auth_token,
-                                        r_token=refresh_token,
-                                        ip=ip_addr)
+                                        r_token=refresh_token)
             else:
                 response_object = {'status': 'fail', 'message': resp}
                 return response_object, 401

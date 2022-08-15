@@ -25,6 +25,24 @@ FIREWALL_PASSWORD = LANConfig.FIREWALL_PASSWORD
 logger = logging.getLogger(__name__)
 
 
+class Vlan:
+    """_summary_
+    """
+    vlan_name = ""
+    gateway_list = []
+    network = ""
+    mask = ""
+    dns_list = []
+    static_bind = []
+
+
+class StaticBind:
+    """_summary_
+    """
+    ip_address = ""
+    mask = ""
+    mac_address = ""
+
 def create_new_binding_in_lan(mac, vlan, ip_addr):
     """Bind mac with static ip_addr address to access internal server on layer-3 switch"""
     try:
@@ -40,10 +58,10 @@ def create_new_binding_in_lan(mac, vlan, ip_addr):
             t_n.write(L3SWICH_PASSWORD.encode('ascii') + b"\n")
 
         t_n.write(b"sys\n")
-        vlan_command = b"dhcp server ip_addr-pool %s\n" % (
+        vlan_command = b"dhcp server ip-pool %s\n" % (
             vlan.encode('ascii'))
         t_n.write(vlan_command)
-        bind_cmd = b"static-bind ip_addr-address %s mask 255.255.255.0 hardware-address %s\n" % (
+        bind_cmd = b"static-bind ip-address %s mask 255.255.255.0 hardware-address %s\n" % (
             ip_addr.encode('ascii'), mac.encode('ascii'))
         t_n.write(bind_cmd)
         t_n.write(b"sa f\n")
@@ -96,10 +114,10 @@ def delete_binding_from_lan(vlan, ip_addr):
             t_n.write(L3SWICH_PASSWORD.encode('ascii') + b"\n")
 
         t_n.write(b"sys\n")
-        vlan_command = b"dhcp server ip_addr-pool %s\n" % (
+        vlan_command = b"dhcp server ip-pool %s\n" % (
             vlan.encode('ascii'))
         t_n.write(vlan_command)
-        un_bind_command = b"undo static-bind ip_addr-address %s\n" % (
+        un_bind_command = b"undo static-bind ip-address %s\n" % (
             ip_addr.encode('ascii'))
         t_n.write(un_bind_command)
         t_n.write(b"sa f\n")
@@ -140,6 +158,7 @@ def get_vlan(vlan):
     """Get mac and ip_addr address binding info from layer 3 switch"""
     try:
         logger.info('getting data for %s', vlan)
+        print('getting data for %s', vlan)
         t_n = telnetlib.Telnet(L3SWICH_HOST)
         t_n.read_until(b"login: ")
         t_n.write(L3SWICH_USER.encode('ascii') + b"\n")
@@ -148,8 +167,8 @@ def get_vlan(vlan):
             t_n.write(L3SWICH_PASSWORD.encode('ascii') + b"\n")
 
         t_n.write(b"sys\n")
-        vlan_command = b"dhcp server ip_addr-pool %s\n" % (
-            vlan.encode('ascii'))
+        vlan_command = b"dhcp server ip-pool %s\n" % (vlan.encode('ascii'))
+        print(vlan_command)
         t_n.write(vlan_command)
         t_n.write(b"dis th\n")
         n_n = 1
@@ -185,23 +204,7 @@ def get_vlan(vlan):
         logger.error(e_msg)
 
 
-class Vlan:
-    """_summary_
-    """
-    vlan_name = ""
-    gateway_list = []
-    network = ""
-    mask = ""
-    dns_list = []
-    static_bind = []
 
-
-class StaticBind:
-    """_summary_
-    """
-    ip_address = ""
-    mask = ""
-    mac_address = ""
 
 
 def static_bind_parsor(line):
@@ -382,4 +385,4 @@ def check_connection(ip_addr):
 
 
 if __name__ == "__main__":
-    print("test! test! test!")
+    print(get_vlan("vlan10"))

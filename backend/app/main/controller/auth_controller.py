@@ -41,7 +41,7 @@ class AccountLogin(Resource):
         """
         post_data = request.json
         ip_ = Auth.ip_address(request)
-        result = Auth.login_account(data=post_data, ip=ip_)
+        result = Auth.login_account(data=post_data, ip_addr=ip_)
         res = make_response(result)
         refresh_token = result[0]['refreshToken']
         res.set_cookie("refreshToken",
@@ -78,8 +78,7 @@ class LogoutAPI(Resource):
             'User is trying to log out from IP ADDRESS: %s with JWT TOKEN:'
             '%s and REFRESH TOKEN: %s', ip_, auth_header, refresh_token)
         return Auth.logout_account(data=auth_header,
-                                   refresh_token=refresh_token,
-                                   ip=ip_)
+                                   refresh_token=refresh_token)
 
 
 @api.route('/refresh-token')

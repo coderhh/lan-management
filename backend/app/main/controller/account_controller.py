@@ -13,6 +13,7 @@ from typing import Dict, Tuple
 from app.main.util.decorator import admin_token_required
 from flask import request
 from flask_restx import Resource
+import logging
 
 from ..service.account_service import (delete_a_account, get_a_account_by_id,
                                        get_all_accounts, save_new_account,
@@ -21,6 +22,7 @@ from ..util.dto import AccountDto
 
 api = AccountDto.api
 _account = AccountDto.account
+logger = logging.getLogger(__name__)
 
 
 @api.route('/')
@@ -48,6 +50,7 @@ class AccountList(Resource):
     def post(self) -> Tuple[Dict[str, str], int]:
         """Creates a new Account """
         data = request.json
+        logger.info(data)
 
         return save_new_account(data=data)
 
