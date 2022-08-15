@@ -1,45 +1,78 @@
-import uuid
+#! python3
+# -*- encoding: utf-8 -*-
+'''
+@File    :   account_service.py
+@Time    :   2022/08/10 10:19:03
+@Author  :   yehanghan
+@Version :   1.0
+@Contact :   yehanghan@gmail.com
+'''
+
 import datetime
+import logging
+import uuid
+from typing import Dict, Tuple
 
 from app.main import db
 from app.main.model.account import Account
-from typing import Dict, Tuple
 
 from ..util.dto import AccountDto
+
 api = AccountDto.api
+logger = logging.getLogger(__name__)
 
 def save_new_account(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
-    account = Account.query.filter_by(email=data['email']).first()
-    if not account:
-        new_account = Account(
-            public_id=str(uuid.uuid4()),
-            email=data['email'],
-            first_name = data['first_name'],
-            last_name = data['last_name'],
-            role=data['role'],
-            password=data['password'],
-            created_on=datetime.datetime.now()
-        )
-        save_changes(new_account)
-        return generate_token(new_account)
-    else:
-        response_object = {
-            'status': 'fail',
-            'message': 'Account already exists. Please Log in.',
-        }
-        return response_object, 409
+    """_summary_
 
-def update_an_account(data: Dict[str, str], public_id) -> Tuple[Dict[str, str], int]:
-    account = get_a_account_by_id(public_id)
+    Args:
+        data (Dict[str, str]): _description_
+
+    Returns:
+        Tuple[Dict[str, str], int]: _description_
+    """
+    try:
+        account = Account.query.filter_by(email=data['email']).first()
+        if not account:
+            new_account = Account(public_id=str(uuid.uuid4()),
+                                email=data['email'],
+                                first_name=data['first_name'],
+                                last_name=data['last_name'],
+                                role=data['role'],
+                                password=data['password'],
+                                created_on=datetime.datetime.now())
+            save_changes(new_account)
+            return generate_token(new_account)
+        else:
+            response_object = {
+                'status': 'fail',
+                'message': 'Account already exists. Please Log in.',
+            }
+            return response_object, 409
+    except RuntimeError as e_msg:
+        logger.error(e_msg)
+
+
+def update_an_account(data: Dict[str, str],
+                      public_id) -> Tuple[Dict[str, str], int]:
+    """_summary_
+
+    Args:
+        data (Dict[str, str]): _description_
+        public_id (_type_): _description_
+
+    Returns:
+        Tuple[Dict[str, str], int]: _description_
+    """
+    account = Account.query.filter_by(public_id=public_id).first()
     if account:
-        account.email=data['email']
+        account.email = data['email']
         account.first_name = data['first_name']
         account.last_name = data['last_name']
-        account.role=data['role']
-        account.password=data['password']
-        account.updated_on=datetime.datetime.now()
+        account.role = data['role']
+        account.password = data['password']
+        account.updated_on = datetime.datetime.now()
 
-        update_account(account)
+        db.session.commit()
         response_object = {
             'status': 'success',
             'message': 'Successfully updated.',
@@ -53,23 +86,48 @@ def update_an_account(data: Dict[str, str], public_id) -> Tuple[Dict[str, str], 
         }
         return response_object, 404
 
+
 def get_all_accounts():
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
     return Account.query.all()
 
+
 def get_a_account_by_id(public_id):
+    """_summary_
+
+    Args:
+        public_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     return Account.query.filter_by(public_id=public_id).first()
 
+
 def delete_a_account(public_id):
-    account = get_a_account_by_id(public_id)
+    """_summary_
+
+    Args:
+        public_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    account = Account.query.filter_by(public_id=public_id).first()
     if account:
-        res = delete_account(account)
-        if res:
+        try:
+            db.session.delete(account)
+            db.session.commit()
             response_object = {
                 'status': 'success',
                 'message': 'Successfully deleted.',
             }
             return response_object, 200
-        else:
+        except RuntimeError:
             response_object = {
                 'status': 'fails',
                 'message': 'can not delete.',
@@ -82,7 +140,16 @@ def delete_a_account(public_id):
         }
         return response_object, 404
 
+
 def generate_token(account: Account) -> Tuple[Dict[str, str], int]:
+    """_summary_
+
+    Args:
+        account (Account): _description_
+
+    Returns:
+        Tuple[Dict[str, str], int]: _description_
+    """
     try:
         # generate the auth token
         auth_token = Account.encode_auth_token(account.id)
@@ -92,25 +159,17 @@ def generate_token(account: Account) -> Tuple[Dict[str, str], int]:
             'Authorization': auth_token.decode()
         }
         return response_object, 201
-    except Exception as e:
+    except RuntimeError:
         response_object = {
             'status': 'fail',
             'message': 'Some error occurred. Please try again.'
         }
         return response_object, 401
-
-
 def save_changes(data: Account) -> None:
+    """_summary_
+
+    Args:
+        data (Account): _description_
+    """
     db.session.add(data)
     db.session.commit()
-def delete_account(data: Account) -> None:
-    try:
-        db.session.delete(data)
-        db.session.commit()
-        return True
-    except Exception as e:
-        api.logger.error(e)
-        return False
-def update_account(data:Account) -> None:
-    db.session.commit()
-

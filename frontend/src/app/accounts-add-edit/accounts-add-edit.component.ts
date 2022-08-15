@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { first } from 'rxjs/operators';
 import { MustMatch } from '../helpers/must-match';
+import { AlertOption } from '../models/AlertOption';
 import { Role, RoleInterface } from '../models/role';
 import { AccountService } from '../service/account.service';
 import { AlertService } from '../service/alert.service';
@@ -14,10 +15,10 @@ import { AlertService } from '../service/alert.service';
 })
 export class AccountsAddEditComponent implements OnInit {
   addEditForm!: FormGroup;
-  id!:string;
+  id!: string;
   isAddMode!: boolean;
-  loading: boolean = false;
-  submitted: boolean = false;
+  loading = false;
+  submitted = false;
   roles!: RoleInterface[];
   constructor(
     private formBuilder: FormBuilder,
@@ -25,35 +26,47 @@ export class AccountsAddEditComponent implements OnInit {
     private router: Router,
     private accountService: AccountService,
     private alertService: AlertService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.id = this.route.snapshot.params['id'];
     this.isAddMode = !this.id;
 
-    this.addEditForm = this.formBuilder.group({
-      first_name: ['', Validators.required],
-      last_name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      role:['', Validators.required],
-      password:['',[Validators.minLength(6), this.isAddMode ? Validators.required: Validators.nullValidator]],
-      confirmPassword: ['']
-    }, {
-      validator: MustMatch('password', 'confirmPassword')
-    });
+    this.addEditForm = this.formBuilder.group(
+      {
+        first_name: ['', Validators.required],
+        last_name: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
+        role: ['', Validators.required],
+        password: [
+          '',
+          [
+            Validators.minLength(6),
+            this.isAddMode ? Validators.required : Validators.nullValidator
+          ]
+        ],
+        confirmPassword: ['']
+      },
+      {
+        validator: MustMatch('password', 'confirmPassword')
+      }
+    );
     this.roles = [
       { value: 'User', viewValue: Role.User },
       { value: 'Admin', viewValue: Role.Admin }
     ];
 
-    if(!this.isAddMode) {
-      this.accountService.getById(this.id)
+    if (!this.isAddMode) {
+      this.accountService
+        .getById(this.id)
         .pipe(first())
-        .subscribe(x => this.addEditForm.patchValue(x));
+        .subscribe((x) => this.addEditForm.patchValue(x));
     }
   }
 
-  get f() { return this.addEditForm.controls; }
+  get f() {
+    return this.addEditForm.controls;
+  }
 
   onSubmit() {
     this.submitted = true;
@@ -64,21 +77,22 @@ export class AccountsAddEditComponent implements OnInit {
       return;
     }
     this.loading = true;
-    if(this.isAddMode) {
+    if (this.isAddMode) {
       this.createAccount();
     } else {
       this.updateAccount();
     }
   }
-  updateAccount(){
-    this.accountService.update(this.id, this.addEditForm.value)
+  updateAccount() {
+    this.accountService
+      .update(this.id, this.addEditForm.value)
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('Update successful', { keepAfterRouteChange: true});
+          this.alertService.success('Update successful', new AlertOption(true));
           this.router.navigate(['../../'], { relativeTo: this.route });
         },
-        error: error => {
+        error: (error) => {
           this.alertService.error(error);
           this.loading = false;
         }
@@ -86,14 +100,18 @@ export class AccountsAddEditComponent implements OnInit {
   }
 
   createAccount() {
-    this.accountService.create(this.addEditForm.value)
+    this.accountService
+      .create(this.addEditForm.value)
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success('Account created successfully', { keepAfterRouteChange: true});
-          this.router.navigate(['../'], { relativeTo: this.route});
+          this.alertService.success(
+            'Account created successfully',
+            new AlertOption(true)
+          );
+          this.router.navigate(['../'], { relativeTo: this.route });
         },
-        error: error => {
+        error: (error) => {
           this.alertService.error(error);
           this.loading = false;
         }

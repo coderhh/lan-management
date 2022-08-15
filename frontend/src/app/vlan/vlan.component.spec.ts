@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { VlanComponent } from './vlan.component';
 
 describe('VlanComponent', () => {
@@ -8,9 +7,8 @@ describe('VlanComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ VlanComponent ]
-    })
-    .compileComponents();
+      declarations: [VlanComponent]
+    }).compileComponents();
   });
 
   beforeEach(() => {

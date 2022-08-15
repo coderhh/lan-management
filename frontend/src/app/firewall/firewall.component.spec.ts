@@ -8,9 +8,8 @@ describe('FirewallComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FirewallComponent ]
-    })
-    .compileComponents();
+      declarations: [FirewallComponent]
+    }).compileComponents();
   });
 
   beforeEach(() => {

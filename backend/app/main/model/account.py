@@ -1,13 +1,24 @@
-from enum import Flag
-from os import access
-from .. import db, flask_bcrypt
+#! python3
+# -*- encoding: utf-8 -*-
+'''
+@File    :   account.py
+@Time    :   2022/08/09 22:18:48
+@Author  :   yehanghan
+@Version :   1.0
+@Contact :   yehanghan@gmail.com
+'''
+
 import datetime
+import secrets
+from typing import Union
+
+import jwt
 from app.main.model.blacklist import BlacklistToken
 from app.main.model.refresh_token import RefreshToken
+
+from .. import db, flask_bcrypt
 from ..config import key
-import jwt
-from typing import Union
-import secrets
+
 
 class Account(db.Model):
     """ Account Model for storing account related details """
@@ -26,13 +37,32 @@ class Account(db.Model):
 
     @property
     def password(self):
+        """_summary_
+
+        Raises:
+            AttributeError: _description_
+        """
         raise AttributeError('password: write-only field')
 
     @password.setter
     def password(self, password):
-        self.password_hash = flask_bcrypt.generate_password_hash(password).decode('utf-8')
+        """_summary_
+
+        Args:
+            password (_type_): _description_
+        """
+        self.password_hash = flask_bcrypt.generate_password_hash(
+            password).decode('utf-8')
 
     def check_password(self, password: str) -> bool:
+        """_summary_
+
+        Args:
+            password (str): _description_
+
+        Returns:
+            bool: _description_
+        """
         return flask_bcrypt.check_password_hash(self.password_hash, password)
 
     @staticmethod
@@ -43,17 +73,17 @@ class Account(db.Model):
         """
         try:
             payload = {
-                'exp': datetime.datetime.now() + datetime.timedelta(days=1, seconds=5),
-                'iat': datetime.datetime.now(),
-                'sub': account_id
+                'exp':
+                datetime.datetime.now() +
+                datetime.timedelta(days=1, seconds=5),
+                'iat':
+                datetime.datetime.now(),
+                'sub':
+                account_id
             }
-            return jwt.encode(
-                payload,
-                key,
-                algorithm='HS256'
-            )
-        except Exception as e:
-            return e
+            return jwt.encode(payload, key, algorithm='HS256')
+        except jwt.ExpiredSignatureError:
+            return jwt.ExpiredSignatureError
 
     @staticmethod
     def decode_auth_token(auth_token: str) -> Union[str, int]:
@@ -77,30 +107,55 @@ class Account(db.Model):
             return 'Invalid token. Please log in again.'
 
     @staticmethod
-    def encode_refresh_token(ip: str):
-        refresh_token = RefreshToken(
-            token = secrets.token_hex(40),
-            expires = datetime.datetime.now() + datetime.timedelta(days=7),
-            created_at = datetime.datetime.now(),
-            created_by_ip = ip
-        )
+    def encode_refresh_token(ip_add: str):
+        """_summary_
+
+        Args:
+            ip (str): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        refresh_token = RefreshToken(token=secrets.token_hex(40),
+                                     expires=datetime.datetime.now() +
+                                     datetime.timedelta(days=7),
+                                     created_at=datetime.datetime.now(),
+                                     created_by_ip=ip_add)
         return refresh_token
+
     @staticmethod
     def remove_old_refresh_token(account: object):
+        """_summary_
+
+        Args:
+            account (object): _description_
+
+        Returns:
+            _type_: _description_
+        """
         try:
-            token_iterator = filter(lambda refresh_token: refresh_token.is_active == True and refresh_token.is_expired == False, account.refresh_tokens)
+            token_iterator = filter(
+                lambda refresh_token: refresh_token.is_active is True and
+                refresh_token.is_expired is False, account.refresh_tokens)
             refresh_tokens = list(token_iterator)
             account.refresh_tokens = refresh_tokens
-        except Exception as e:
-            return e
-    @staticmethod
-    def asdict(self):
-        return {'public_id': self.public_id,
-                'email': self.email,
-                'first_name': self.first_name,
-                'last_name': self.last_name,
-                'role': self.role}
+        except AttributeError:
+            return AttributeError
 
+    @staticmethod
+    def asdict(class_instance):
+        """_summary_
+
+        Returns:
+            _type_: _description_
+        """
+        return {
+            'public_id': class_instance.public_id,
+            'email': class_instance.email,
+            'first_name': class_instance.first_name,
+            'last_name': class_instance.last_name,
+            'role': class_instance.role
+        }
 
     def __repr__(self):
-        return "<Account '{}'>".format(self.email)
+        return f"<Account '{self.email}'>."

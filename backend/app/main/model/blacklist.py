@@ -1,5 +1,16 @@
-from .. import db
+#! python3
+# -*- encoding: utf-8 -*-
+'''
+@File    :   blacklist.py
+@Time    :   2022/08/10 09:57:23
+@Author  :   yehanghan
+@Version :   1.0
+@Contact :   yehanghan@gmail.com
+'''
+
 import datetime
+
+from .. import db
 
 
 class BlacklistToken(db.Model):
@@ -17,13 +28,18 @@ class BlacklistToken(db.Model):
         self.blacklisted_on = datetime.datetime.now()
 
     def __repr__(self):
-        return '<id: token: {}'.format(self.token)
+        return f'<id: token: {self.token}'
 
     @staticmethod
     def check_blacklist(auth_token: str) -> bool:
+        """_summary_
+
+        Args:
+            auth_token (str): _description_
+
+        Returns:
+            bool: _description_
+        """
         # check whether auth token has been blacklisted
         res = BlacklistToken.query.filter_by(token=str(auth_token)).first()
-        if res:
-            return True
-        else:
-            return False
+        return bool(res)
