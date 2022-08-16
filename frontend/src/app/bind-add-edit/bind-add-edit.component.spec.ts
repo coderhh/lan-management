@@ -1,4 +1,7 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormBuilder } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { BindAddEditComponent } from './bind-add-edit.component';
 
@@ -8,7 +11,9 @@ describe('BindAddEditComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [BindAddEditComponent]
+      imports: [RouterTestingModule, HttpClientTestingModule],
+      declarations: [BindAddEditComponent],
+      providers: [FormBuilder]
     }).compileComponents();
   });
 

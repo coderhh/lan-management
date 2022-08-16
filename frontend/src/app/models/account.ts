@@ -6,9 +6,7 @@ export class Account {
   public role?: string;
   public jwtToken?: string;
   public refreshToken?: string;
-  /**
-   *
-   */
+
   constructor(
     id?: string,
     firstName?: string,

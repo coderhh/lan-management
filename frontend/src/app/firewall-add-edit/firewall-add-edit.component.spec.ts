@@ -1,4 +1,7 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormBuilder } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { FirewallAddEditComponent } from './firewall-add-edit.component';
 
@@ -8,7 +11,9 @@ describe('FirewallAddEditComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [FirewallAddEditComponent]
+      imports: [RouterTestingModule, HttpClientTestingModule],
+      declarations: [FirewallAddEditComponent],
+      providers: [FormBuilder]
     }).compileComponents();
   });
 

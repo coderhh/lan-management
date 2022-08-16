@@ -12,6 +12,7 @@
   "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
     "require-jsdoc": "off",
-    "new-cap": "off"
+    "new-cap": "off",
+    "valid-jsdoc": "off"
   }
 }

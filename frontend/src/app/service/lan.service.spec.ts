@@ -1,16 +1,23 @@
-import { TestBed } from '@angular/core/testing';
-
+import { TestBed, inject } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController
+} from '@angular/common/http/testing';
 import { LanService } from './lan.service';
 
 describe('LanService', () => {
-  let service: LanService;
+  let httpTestingController: HttpTestingController;
+  let lanService: LanService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(LanService);
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
+    httpTestingController = TestBed.get(HttpTestingController);
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+  beforeEach(inject([LanService], (service: LanService) => {
+    lanService = service;
+  }));
 });
