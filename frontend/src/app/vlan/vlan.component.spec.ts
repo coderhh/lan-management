@@ -1,4 +1,8 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AlertService } from '../service/alert.service';
+import { LanService } from '../service/lan.service';
 import { VlanComponent } from './vlan.component';
 
 describe('VlanComponent', () => {
@@ -7,7 +11,9 @@ describe('VlanComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [VlanComponent]
+      imports: [RouterTestingModule, HttpClientTestingModule],
+      declarations: [VlanComponent],
+      providers: [LanService, AlertService]
     }).compileComponents();
   });
 

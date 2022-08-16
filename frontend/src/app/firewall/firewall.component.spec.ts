@@ -1,4 +1,8 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AlertService } from '../service/alert.service';
+import { LanService } from '../service/lan.service';
 
 import { FirewallComponent } from './firewall.component';
 
@@ -8,7 +12,9 @@ describe('FirewallComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [FirewallComponent]
+      imports: [RouterTestingModule, HttpClientTestingModule],
+      declarations: [FirewallComponent],
+      providers: [LanService, AlertService]
     }).compileComponents();
   });
 
