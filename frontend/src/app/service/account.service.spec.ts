@@ -46,6 +46,19 @@ describe('AccountService', () => {
     request.flush(dummyAccounts);
   });
 
+  it('be able to create account from API bis POST', () => {
+    const dummyAccount = {
+      public_id: '1',
+      last_name: 'last_name'
+    };
+
+    service.create(dummyAccount).subscribe((account) => {
+      expect(account).toEqual(dummyAccount);
+    });
+    const request = httpMock.expectOne(baseUrl);
+    expect(request.request.method).toBe('POST');
+  });
+
   afterEach(() => {
     httpMock.verify();
   });
