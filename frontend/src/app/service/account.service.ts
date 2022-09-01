@@ -6,7 +6,7 @@ import { Account } from '../models/account';
 import { environment } from '../../environments/environment';
 import { finalize, map } from 'rxjs/operators';
 
-const baseUrl = `${environment.apiUrl}/account`;
+const baseUrl = `${environment.apiUrl}/account/`;
 const authUrl = `${environment.apiUrl}/auth`;
 @Injectable({
   providedIn: 'root'
@@ -50,19 +50,19 @@ export class AccountService {
   }
 
   getAll(): Observable<Account[]> {
-    return this.http.get<Account[]>(`${baseUrl}/`);
+    return this.http.get<Account[]>(`${baseUrl}`);
   }
 
   getById(id: string): Observable<Account> {
-    return this.http.get<Account>(`${baseUrl}/${id}`);
+    return this.http.get<Account>(`${baseUrl}${id}`);
   }
 
   create(params: object): Observable<Account> {
-    return this.http.post<Account>(`${baseUrl}/`, params);
+    return this.http.post<Account>(`${baseUrl}`, params);
   }
 
   update(id: string, params: object): Observable<Account> {
-    return this.http.put<Account>(`${baseUrl}/${id}`, params).pipe(
+    return this.http.put<Account>(`${baseUrl}${id}`, params).pipe(
       map((account: Account) => {
         if (account.public_id === this.accountValue.public_id) {
           account = { ...this.accountValue, ...account };
@@ -74,7 +74,7 @@ export class AccountService {
   }
 
   delete(id: string) {
-    return this.http.delete(`${baseUrl}/${id}`).pipe(
+    return this.http.delete(`${baseUrl}${id}`).pipe(
       finalize(() => {
         if (id === this.accountValue.public_id) this.logout();
       })
