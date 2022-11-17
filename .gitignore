@@ -107,3 +107,6 @@ ENV/
 getting-started/
 *.db
 backend/app/main/*.db
+lan-management-api/obj
+lan-management-api/bin
+
