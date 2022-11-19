@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using lan_management_api.Helpers;
-using lan_management_api.Services;
 
 namespace lan_management_api;
 
@@ -9,22 +8,24 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
+        var services = builder.Services;
         // Add services to the container.
 
-        builder.Services.AddControllers();
+        services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-        var servies = builder.Services;
-        servies.AddDbContext<DataContext>();
-        servies.AddCors();
-        servies.AddControllers().AddJsonOptions(x =>
+
+        services.AddDbContext<DataContext>();
+        services.AddCors();
+        services.AddControllers().AddJsonOptions(x =>
         {
             x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
-        servies.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IEmailService, EmailService>();
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

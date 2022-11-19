@@ -1,7 +1,4 @@
-using lan_management_api.Models.Accounts;
-using lan_management_api.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Tls;
 
 namespace lan_management_api.Controllers;
 
@@ -10,8 +7,9 @@ namespace lan_management_api.Controllers;
 [Route("[controller]")]
 public class AccountsController : BaseController
 {
-    private readonly ILogger<AccountsController> _logger;
     private readonly IAccountService _accountService;
+    private readonly ILogger<AccountsController> _logger;
+
 
     public AccountsController(ILogger<AccountsController> logger, IAccountService accountService)
     {
@@ -20,30 +18,72 @@ public class AccountsController : BaseController
     }
 
     [AllowAnonymous]
-    [HttpPost("authenticate")]
-    public ActionResult Authenticate()
+    [HttpGet]
+    public ActionResult<IEnumerable<AccountResponse>> GetAll()
     {
-        return Ok();
+        var accounts = _accountService.GetAll();
+        return Ok(accounts);
     }
 
     [AllowAnonymous]
-    [HttpPost("refresh-token")]
-    public ActionResult RefreshToken()
+    [HttpPost]
+    public ActionResult<AccountResponse> Create(CreateRequest model)
     {
-        return Ok();
-    }
-
-    [HttpPost("revoke-token")]
-    public IActionResult RevokeToken()
-    {
-        return Ok();
+        var account = _accountService.Create(model);
+        return Ok(account);
     }
 
     [AllowAnonymous]
-    [HttpPost("register")]
-    public IActionResult Register(RegisterRequest model)
+    [HttpGet("{id:int}")]
+    public ActionResult<AccountResponse> GetById(int id)
     {
-        _accountService.Register(model, Request.Headers["origin"]);
-        return Ok(new { message = "Please check your email for password reset instructions" });
+        var account = _accountService.GetById(id);
+        return Ok(account);
     }
+    [AllowAnonymous]
+    [HttpDelete("{id:int}")]
+    public IActionResult Delete(int id)
+    {
+        _accountService.Delete(id);
+        return Ok(new {message = "Account deleted successfully"});
+    }
+    [AllowAnonymous]
+    [HttpPut("{id:int}")]
+    public ActionResult<AccountResponse> Update(int id, UpdateRequest model)
+    {
+        var account = _accountService.Update(id, model);
+        return Ok(account);
+    }
+
+    #region MyRegion
+
+    // [AllowAnonymous]
+    // [HttpPost("authenticate")]
+    // public ActionResult Authenticate()
+    // {
+    //     return Ok();
+    // }
+    //
+    // [AllowAnonymous]
+    // [HttpPost("refresh-token")]
+    // public ActionResult RefreshToken()
+    // {
+    //     return Ok();
+    // }
+    //
+    // [HttpPost("revoke-token")]
+    // public IActionResult RevokeToken()
+    // {
+    //     return Ok();
+    // }
+    //
+    // [AllowAnonymous]
+    // [HttpPost("register")]
+    // public IActionResult Register(RegisterRequest model)
+    // {
+    //     _accountService.Register(model, Request.Headers["origin"]);
+    //     return Ok(new {message = "Please check your email for password reset instructions"});
+    // }
+
+    #endregion
 }

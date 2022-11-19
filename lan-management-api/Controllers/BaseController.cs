@@ -1,9 +1,6 @@
-﻿using lan_management_api.Entities;
-using Microsoft.AspNetCore.Mvc;
+﻿namespace lan_management_api.Controllers;
 
-namespace lan_management_api.Controllers;
-
-public abstract class BaseController: ControllerBase
+public abstract class BaseController : ControllerBase
 {
     public Account Account => (Account) HttpContext.Items["Account"];
 }

@@ -1,9 +1,8 @@
-﻿using lan_management_api.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace lan_management_api.Helpers;
 
-public class DataContext: DbContext
+public class DataContext : DbContext
 {
     private readonly IConfiguration _configuration;
 
@@ -11,11 +10,12 @@ public class DataContext: DbContext
     {
         _configuration = configuration;
     }
-    
+
     public DbSet<Account> Accounts { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        options.UseSqlite(_configuration.GetConnectionString("lan-management-database"));
+        //options.UseSqlite(_configuration.GetConnectionString("lan-management-database"));
+        options.UseSqlServer(_configuration.GetConnectionString("lan-management-database"));
     }
 }
