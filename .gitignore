@@ -107,6 +107,6 @@ ENV/
 getting-started/
 *.db
 backend/app/main/*.db
-lan-management-api/obj
-lan-management-api/bin
+dotnet_core/lan-management-api/obj
+dotnet_core/lan-management-api/bin
 

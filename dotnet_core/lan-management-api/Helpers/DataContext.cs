@@ -2,7 +2,7 @@
 
 namespace lan_management_api.Helpers;
 
-public class DataContext : DbContext
+public sealed class DataContext : DbContext
 {
     private readonly IConfiguration _configuration;
 

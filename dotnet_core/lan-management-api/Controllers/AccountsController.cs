@@ -1,5 +1,3 @@
-using Org.BouncyCastle.Tls;
-
 namespace lan_management_api.Controllers;
 
 [Authorize]
@@ -9,7 +7,6 @@ public class AccountsController : BaseController
 {
     private readonly IAccountService _accountService;
     private readonly ILogger<AccountsController> _logger;
-
 
     public AccountsController(ILogger<AccountsController> logger, IAccountService accountService)
     {
