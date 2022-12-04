@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using lan_management_api.Helpers;
+using lan_management_api.Repositories;
 
 namespace lan_management_api;
 
@@ -19,6 +20,7 @@ public class Program
 
 
         services.AddDbContext<DataContext>();
+        services.AddSingleton<DapperContext>();
         services.AddCors();
         services.AddControllers().AddJsonOptions(x =>
         {
@@ -26,6 +28,7 @@ public class Program
         });
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IAccountRepository, AccountRepository>();
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

@@ -16,39 +16,61 @@ public class AccountsController : BaseController
 
     [AllowAnonymous]
     [HttpGet]
-    public ActionResult<IEnumerable<AccountResponse>> GetAll()
+    public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAll()
     {
-        var accounts = _accountService.GetAll();
+        var accounts = await _accountService.GetAll();
         return Ok(accounts);
     }
 
     [AllowAnonymous]
     [HttpPost]
-    public ActionResult<AccountResponse> Create(CreateRequest model)
+    public async Task<ActionResult<AccountResponse>> Create(CreateRequest model)
     {
-        var account = _accountService.Create(model);
+        var account = await _accountService.Create(model);
         return Ok(account);
     }
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public ActionResult<AccountResponse> GetById(int id)
+    public async Task<ActionResult<AccountResponse>> GetById(int id)
     {
-        var account = _accountService.GetById(id);
+        var account = await _accountService.GetById(id);
         return Ok(account);
     }
     [AllowAnonymous]
     [HttpDelete("{id:int}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        _accountService.Delete(id);
-        return Ok(new {message = "Account deleted successfully"});
+        var result  = await _accountService.Delete(id);
+        if (result)
+        {
+            return Ok(new {message = "Account deleted successfully"});
+        }
+        else
+        {
+            return BadRequest();
+        }
+    }
+    
+    [AllowAnonymous]
+    [HttpDelete]
+    public async Task<IActionResult> DeleteAll()
+    {
+        var res = await _accountService.DeleteAll();
+        if (res)
+        {
+            return Ok(new {message = "All accounts deleted successfully"});
+        }
+        else
+        {
+            return BadRequest();
+        }
     }
     [AllowAnonymous]
     [HttpPut("{id:int}")]
-    public ActionResult<AccountResponse> Update(int id, UpdateRequest model)
+    public async Task<ActionResult<AccountResponse>> Update(int id, UpdateRequest model)
     {
-        var account = _accountService.Update(id, model);
+        var account = await _accountService.Update(id, model);
         return Ok(account);
     }
 

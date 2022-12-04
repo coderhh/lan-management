@@ -1,5 +1,9 @@
-﻿using System.Security.Cryptography;
+﻿using System.Data;
+using System.Security.Cryptography;
+using Dapper;
 using lan_management_api.Helpers;
+using lan_management_api.Repositories;
+using Microsoft.Data.SqlClient;
 
 namespace lan_management_api.Services;
 
@@ -8,15 +12,23 @@ public class AccountService : IAccountService
     private readonly DataContext _context;
     private readonly IEmailService _emailService;
     private readonly IMapper _mapper;
+    private readonly IConfiguration _configuration;
+    private readonly IAccountRepository _accountRepository;
 
-    public AccountService(DataContext context, IEmailService emailService, IMapper mapper)
+    public AccountService(DataContext context,
+        IEmailService emailService,
+        IMapper mapper,
+        IConfiguration configuration,
+        IAccountRepository accountRepository)
     {
         _context = context;
         _emailService = emailService;
         _mapper = mapper;
+        _configuration = configuration;
+        _accountRepository = accountRepository;
     }
 
-    public void Register(RegisterRequest model, string origin)
+    public async void Register(RegisterRequest model, string origin)
     {
         if (_context.Accounts.Any(x => x.Email == model.Email))
         {
@@ -29,7 +41,7 @@ public class AccountService : IAccountService
         var isFirstAccount = _context.Accounts.Count() == 0;
         account.Role = isFirstAccount ? Role.Admin : Role.User;
         account.Created = DateTime.UtcNow;
-        account.VerificationToken = GenerateVerificationToken();
+        account.VerificationToken = await GenerateVerificationToken();
 
         account.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
 
@@ -37,47 +49,48 @@ public class AccountService : IAccountService
         _context.SaveChanges();
     }
 
-    public IEnumerable<AccountResponse> GetAll()
+    public async Task<IEnumerable<AccountResponse>> GetAll()
     {
-        var accounts = _context.Accounts;
+        var accounts = await _accountRepository.GetAllAccounts();
         return _mapper.Map<IList<AccountResponse>>(accounts);
     }
 
-    public AccountResponse Create(CreateRequest model)
+    public async Task<AccountResponse> Create(CreateRequest model)
     {
-        if (_context.Accounts.Any(x => x.Email == model.Email))
+        #region Dapper Implementation
+        var accounts = await _accountRepository.GetAccountsByEmail(model.Email);
+        if (accounts.Any())
+        {
             throw new AppException($"Email '{model.Email}' is already registered");
-
+        }
         var account = _mapper.Map<Account>(model);
         account.Created = DateTime.UtcNow;
         account.Verified = DateTime.UtcNow;
-        account.VerificationToken = GenerateVerificationToken();
-
+        account.VerificationToken = await GenerateVerificationToken();
         account.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
 
-        _context.Accounts.Add(account);
-        _context.SaveChanges();
+        var result = await _accountRepository.CreateAccount(account);
+        
+        return _mapper.Map<AccountResponse>(result);
 
+        #endregion
+    }
+
+    public async Task<AccountResponse> GetById(int id)
+    {
+        var account = await _accountRepository.GetAccountById(id);
         return _mapper.Map<AccountResponse>(account);
     }
-
-    public AccountResponse GetById(int id)
+    public async Task<bool> Delete(int id)
     {
-        var account = GetAccount(id);
-        return _mapper.Map<AccountResponse>(account);
+        return await _accountRepository.DeleteAccountById(id);
     }
 
-    public void Delete(int id)
+    public async Task<AccountResponse> Update(int id, UpdateRequest model)
     {
-        var account = GetAccount(id);
-        _context.Accounts.Remove(account);
-        _context.SaveChanges();
-    }
-
-    public AccountResponse Update(int id, UpdateRequest model)
-    {
-        var account = GetAccount(id);
-        if (account.Email != model.Email && _context.Accounts.Any(x => x.Email == model.Email))
+        var account = await GetAccount(id);
+        var accountWithSameEmail = await _accountRepository.GetAccountsByEmail(model.Email);
+        if (account.Email != model.Email && accountWithSameEmail.Any())
             throw new AppException($"Email '{model.Email}' is already registered");
 
         if (!string.IsNullOrEmpty(model.Password))
@@ -85,15 +98,20 @@ public class AccountService : IAccountService
 
         _mapper.Map(model, account);
         account.Updated = DateTime.UtcNow;
-        _context.Accounts.Update(account);
-        _context.SaveChanges();
+        await _accountRepository.UpdateAccount(account);
 
         return _mapper.Map<AccountResponse>(account);
     }
 
-    private Account GetAccount(int id)
+    public async Task<bool> DeleteAll()
     {
-        var account = _context.Accounts.Find(id);
+        var res = await _accountRepository.DeleteAllAccount();
+        return res;
+    }
+
+    private async Task<Account> GetAccount(int id)
+    {
+        var account = await _accountRepository.GetAccountById(id);
         if (account == null) throw new KeyNotFoundException("Account not found");
         return account;
     }
@@ -113,14 +131,16 @@ public class AccountService : IAccountService
         );
     }
 
-    private string GenerateVerificationToken()
+    private async Task<string> GenerateVerificationToken()
     {
         var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
 
-        var tokenIsUnique = !_context.Accounts.Any(x => x.VerificationToken == token);
+        var account = await _accountRepository.GetAccountByVerificationToken(token);
+
+        var tokenIsUnique = account == null;
 
         if (!tokenIsUnique)
-            return GenerateVerificationToken();
+            return await GenerateVerificationToken();
         return token;
     }
 }

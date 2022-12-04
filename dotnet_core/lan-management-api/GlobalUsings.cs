@@ -7,3 +7,6 @@ global using Microsoft.AspNetCore.Mvc;
 global using AutoMapper;
 global using lan_management_api.Entities;
 global using System.ComponentModel.DataAnnotations;
+using Dapper;
+using System.Data;
+using Microsoft.Data.SqlClient;

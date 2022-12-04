@@ -1,4 +1,6 @@
 
+using System.ComponentModel;
+
 public class CreateRequest
 {
     [Required] public string Title { get; set; }
@@ -9,6 +11,7 @@ public class CreateRequest
 
     [Required]
     [EnumDataType(typeof(Role))]
+    [DefaultValue("Admin")]
     public string Role { get; set; }
 
     [Required] [EmailAddress] public string Email { get; set; }
