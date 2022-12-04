@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using lan_management_api.Helpers;
 using lan_management_api.Repositories;
+using StackExchange.Redis;
 
 namespace lan_management_api;
 
@@ -25,6 +26,12 @@ public class Program
         services.AddControllers().AddJsonOptions(x =>
         {
             x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+        
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = builder.Configuration.GetConnectionString("redis");
+            options.InstanceName = "lan-management-api_";
         });
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IEmailService, EmailService>();
