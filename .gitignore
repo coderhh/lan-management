@@ -110,3 +110,5 @@ backend/app/main/*.db
 dotnet_core/lan-management-api/obj
 dotnet_core/lan-management-api/bin
 
+dotnet_core/lan-management-api.test/bin
+dotnet_core/lan-management-api.test/obj
