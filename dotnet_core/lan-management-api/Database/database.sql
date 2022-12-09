@@ -49,4 +49,12 @@ create index IX_RefreshToken_AccountId
     on RefreshToken (AccountId)
 go
 
+create table FirewallRules(
+    Id         int identity(1,1)
+        constraint PK_FirewallRules
+            primary key,
+    IpAddress  nvarchar(50)   not null,
+    VlanId     int            not null,
+    AccountId  int            
+)
 
